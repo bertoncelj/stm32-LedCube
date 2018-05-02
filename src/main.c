@@ -1,11 +1,15 @@
- #include <stm32f4xx.h>
- #include <stm32f4xx_rcc.h>
- #include <stm32f4xx_gpio.h>
- #include <stm32f4xx_tim.h>
- #include <stm32f4xx_spi.h>
-#include "tm_stm32f4_delay.h"
+
+#include <stm32f4xx.h>
+#include <stm32f4xx_rcc.h>
+#include <stm32f4xx_gpio.h>
+#include <stm32f4xx_tim.h>
+#include <stm32f4xx_spi.h>
 #include <misc.h>
- #include "tlc5940.h"
+#include "tm_stm32f4_delay.h"
+#include "tlc_animations.h"
+#include "tlc5940.h"
+
+
 /*
  * Pin configuration
  *
@@ -36,7 +40,7 @@ int timer_update=0;
 
 int main(void){
  SystemInit(); //168mhz
- init_tim7();
+ //init_tim7();
  init_SPI1();
  Timer_Init(); //GSCLK + BLANK
  TM_DELAY_Init();
@@ -87,20 +91,28 @@ int main(void){
 				 Blank_Pulse();
 
 		*/
- int i;
-// TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+
+ TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
  while(1){
 
-	 for(i = 0; i < 48; i++){
-		 TLC_here();
-	 	 //Delayms(100);
-	 }
+	 BasicAnim_Colors();
+	 //Delayms(10000);
+
+
+
+
+
+
+
+
+	 	BasicAnim_RGB_All();
+
+
+//NOTE: Porpravi timer 3 prescaler and period!
 
 
 	 /*
-
-	 GPIO_SetPinHigh(GPIOD,GPIO_Pin_12);
 
 	 while(timer_update>20){
 

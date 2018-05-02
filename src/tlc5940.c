@@ -11,13 +11,23 @@ void TLC_Pin_Init(void);
 //replace TIM2 with your desired Timer...
 void TIM3_IRQHandler(void)
 {
-	 TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-	 int i;
-	 for (i = 0; i < 4096; i++){
-			 		TLC5940_GPIO->BSRRL = PIN_GSCLK;
-			 		TLC5940_GPIO->BSRRH = PIN_GSCLK;
-			 				}
-			 Blank_Pulse();
+
+	 TLC_here();
+	// GSCLK_Pulzes();
+}
+
+void GSCLK_Pulzes()
+{
+	TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	int i;
+	TLC5940_GPIO->BSRRL = PIN_VPRG;
+	TLC5940_GPIO->BSRRH = PIN_VPRG;
+	for (i = 0; i < 4096; i++){
+		 		TLC5940_GPIO->BSRRL = PIN_GSCLK;
+		 		TLC5940_GPIO->BSRRH = PIN_GSCLK;
+		 				}
+		 Blank_Pulse();
+
 }
 
 void setTLCChannel(uint8_t channel, uint16_t val)
@@ -37,8 +47,8 @@ void Timer_Init()
     //init 1 ms timer
     TIM_TimeBase_InitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBase_InitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBase_InitStructure.TIM_Period = 1;
-    TIM_TimeBase_InitStructure.TIM_Prescaler = 35999;
+    TIM_TimeBase_InitStructure.TIM_Period = 8399;
+    TIM_TimeBase_InitStructure.TIM_Prescaler = 200;
     TIM_TimeBaseInit(TIM3, &TIM_TimeBase_InitStructure);
 
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
@@ -275,6 +285,7 @@ void updateTLC()
 	    GPIO_WriteBit(PORTx_TLC5940, DD_XLAT, RESET);
 	    Delayms(1);
 	    clkCnt = 0;
+
 	    TIM_Cmd(TIM2, ENABLE);
 
 }
@@ -306,15 +317,43 @@ void Tlc5940_setAllDC(uint8_t value)
 
 }
 
+void TLC_Update_lvl(uint16_t *data_lvl)
+{
+	uint8_t n;
+	//u16 data[COUNT_TLC* 16]={0x0000 ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000};
+
+	//TIM_Cmd(TIM3, DISABLE);
+
+
+	//GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
+	 //Test
+	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
+	 for(n=0; n<(COUNT_TLC *16); n=n+2){
+		 SPI1_send(data_lvl[n]>>4);
+		 SPI1_send((data_lvl[n]<<4) | (data_lvl[n+1])>>8);
+		 SPI1_send(data_lvl[n+1]);
+	 }
+
+	 //_delay(1);
+	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_XLAT);
+	 //_delay(1);
+	 GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
+	 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
+
+	 GSCLK_Pulzes();
+	 //TIM_Cmd(TIM3, ENABLE);
+}
+
+
 void TLC_One_Led_On(uint8_t led_num)
 {
 	uint8_t n;
 	u16 data[COUNT_TLC* 16]={0x0000 ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000};
 
-//	TIM_Cmd(TIM3, DISABLE);
 
+	//TIM_Cmd(TIM3, DISABLE);
+	//GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
 
-	GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
 	data[led_num] = 4095;
 	 //Test
 	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
@@ -330,12 +369,13 @@ void TLC_One_Led_On(uint8_t led_num)
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
 
-
-	//TIM_Cmd(TIM3, ENABLE);
+	 GSCLK_Pulzes();
+	 //TIM_Cmd(TIM3, ENABLE);
 }
 
 void TLC_here()
 {
+
 
 	GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
 	TLC_One_Led_On(0);
@@ -343,6 +383,22 @@ void TLC_here()
 	GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_4);
 
 
+
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
+			TLC_Update_lvl(&data_lvl1[0]);
+			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_4);
+
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
+			TLC_Update_lvl(&data_lvl2[0]);
+			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_3);
+
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
+			TLC_Update_lvl(&data_lvl3[0]);
+			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_2);
+
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
+			TLC_Update_lvl(&data_lvl4[0]);
+			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_1);
 
 }
 
@@ -352,8 +408,8 @@ TIM_TimeBaseInitTypeDef TIM_TBInitStruct;
 NVIC_InitTypeDef NVIC_InitStructure;
 
 RCC_APB1PeriphClockCmd(RCC_APB1ENR_TIM7EN,ENABLE); // Timer saat kaynağını aç
-TIM_TBInitStruct.TIM_Prescaler =4199; // ÖnBölücü (PSC) değeri 4199
-TIM_TBInitStruct.TIM_Period =9; // Otomatik geri yükleme (ARR) eşiği 1
+TIM_TBInitStruct.TIM_Prescaler =2000; // ÖnBölücü (PSC) değeri 4199
+TIM_TBInitStruct.TIM_Period =40; // Otomatik geri yükleme (ARR) eşiği 1
 TIM_TimeBaseInit(TIM7,&TIM_TBInitStruct); // Timeri init et
 
 TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE); // Timer Update olayında interrupt istesin.
@@ -440,7 +496,7 @@ SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b; // one packet of data is 8 bits w
 SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low; // clock is low when idle
 SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge; // data sampled at first edge
 SPI_InitStruct.SPI_NSS = SPI_NSS_Soft | SPI_NSSInternalSoft_Set; // set the NSS management to internal and pull internal NSS high
-SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64; // SPI frequency is APB2 frequency / 4
+SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; // SPI frequency is APB2 frequency / 4
 SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;// data is transmitted MSB first
 SPI_Init(SPI1, &SPI_InitStruct);
 

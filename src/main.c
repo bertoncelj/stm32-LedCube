@@ -97,7 +97,7 @@ int main(void){
  while(1){
 
 	 BasicAnim_Colors();
-	 //Delayms(10000);
+	// Delayms(10000);
 
 
 
@@ -106,7 +106,7 @@ int main(void){
 
 
 
-	 	BasicAnim_RGB_All();
+	 BasicAnim_RGB_All();
 
 
 //NOTE: Porpravi timer 3 prescaler and period!

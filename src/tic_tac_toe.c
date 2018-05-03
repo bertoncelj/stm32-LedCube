@@ -31,7 +31,7 @@ int board[25] = {
 	20,21,22,23,24
 }
 */
-int board[36];
+
 const int Directions[4] = { 1, 6, 5, 7};
 
 const int ConvertTo36[16] = {
@@ -46,10 +46,10 @@ void BUTTON1_EventHandler(TM_BUTTON_PressType_t type) {
 	if (type == TM_BUTTON_PressType_OnPressed) {
 		//data_lvl1[led_value] = 4095;
 	} else if (type == TM_BUTTON_PressType_Normal) {
-		data_lvl1[led_value + 16] = 4095;
+		//data_lvl1[led_value + 16] = 4095;
 		led_button_choosen = led_value;
 	} else {
-		data_lvl1[led_value + 16] = 0;
+		//data_lvl1[led_value + 16] = 0;
 
 	}
 }
@@ -91,7 +91,7 @@ int FindFourInARow(const int *board, const int ourindex, const int us) {
 	for(DirIndex = 0; DirIndex < 4; ++DirIndex) {
 		Dir = Directions[DirIndex];
 		FourCount += GetNumForDir(ourindex + Dir, Dir, board, us);
-		FourCount += GetNumForDir(ourindex + Dir * -1, Dir * -1, board, us);
+		FourCount += GetNumForDir(ourindex + Dir * (-1), Dir * (-1), board, us);
 		if(FourCount == 4) {
 			break;
 		}
@@ -119,9 +119,9 @@ void PrintBoard(const int *board) {
 	for(n = 0; n < 16; n++){
 		board_value = board[ConvertTo36[n]];
 		if(board_value == NOUGHTS )
-			data_lvl1[led_value + 16] = 4095;
+			data_lvl1[n + 16] = 4095;
 		if(board_value == CROSSES )
-			data_lvl1[led_value + 32] = 4095;
+			data_lvl1[n + 32] = 4095;
 	}
 
 	/*
@@ -237,7 +237,7 @@ void RunGame() {
 	int GameOver = 0;
 	int Side = NOUGHTS;
 	int LastMoveMade = 0;
-
+	int board[36];
 
 	InitialiseBoard(&board[0]);
 	PrintBoard(&board[0]);
@@ -247,6 +247,7 @@ void RunGame() {
 			LastMoveMade = GetHumanMove(&board[0]);
 			MakeMove(&board[0],LastMoveMade,Side);
 			Side=CROSSES;
+			PrintBoard(&board[0]);
 		} else {
 			LastMoveMade = GetComputerMove(&board[0]);
 			MakeMove(&board[0],LastMoveMade,Side);
@@ -279,7 +280,7 @@ void RunGame() {
 
 void Rungame_here()
 {
-	TM_RNG_Init();
+ 	TM_RNG_Init();
 	RunGame();
 }
 

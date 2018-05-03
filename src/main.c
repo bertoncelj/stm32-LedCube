@@ -103,8 +103,8 @@ int main(void){
  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
  while(1){
-
-	 //BasicAnim_Colors();
+	//BasicAnim_One_startToEnd();
+	//BasicAnim_Colors();
 	// Delayms(10000);
 
 	 Rungame_here();
@@ -114,7 +114,7 @@ int main(void){
 
 
 
-	 //BasicAnim_RGB_All();
+	 BasicAnim_RGB_All();
 
 
 //NOTE: Porpravi timer 3 prescaler and period!

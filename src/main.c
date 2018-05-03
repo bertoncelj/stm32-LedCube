@@ -91,22 +91,22 @@ int main(void){
 				 Blank_Pulse();
 
 		*/
-
+ TM_ADC_Init(ADC1, ADC_Channel_0);
  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
  while(1){
 
-	 BasicAnim_Colors();
+	// BasicAnim_Colors();
 	// Delayms(10000);
 
+	 read_ADC_led();
 
 
 
 
 
 
-
-	 BasicAnim_RGB_All();
+	// BasicAnim_RGB_All();
 
 
 //NOTE: Porpravi timer 3 prescaler and period!

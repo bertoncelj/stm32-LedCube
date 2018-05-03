@@ -15,5 +15,5 @@
 
 void BasicAnim_RGB_All();
 void BasicAnim_Colors();
-
+void BasicAnim_One_startToEnd();
 #endif /* TLC_ANIMATIONS_H_ */

@@ -1,6 +1,7 @@
 #ifndef TLC5940_H
 #define TLC5940_H
-
+#include <stdio.h>
+#include <stdlib.h>
 #include "stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
 #include "defines.h"

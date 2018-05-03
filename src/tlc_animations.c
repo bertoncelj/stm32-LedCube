@@ -78,3 +78,16 @@ void BasicAnim_RGB_All()
 			data_lvl4[n] = 0;
 		}
 }
+void BasicAnim_One_startToEnd()
+{
+	int n;
+	for(n = 0; n < 48; n++){
+		data_lvl1[n] = 4095;
+		Delayms(200);
+		data_lvl1[n] = 0;
+	}
+
+
+
+
+}

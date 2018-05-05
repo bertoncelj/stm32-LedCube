@@ -14,7 +14,7 @@
 #include "tm_stm32f4_rng.h"
 #include "tlc5940.h"
 
-enum { NOUGHTS, CROSSES, BORDER, EMPTY };
+enum { NOUGHTS, CROSSES, BORDER, EMPTY, LEDOFFN, LEDOFFC};
 enum { HUMANWIN, COMPWIN, DRAW };
 
 
@@ -32,7 +32,7 @@ void BUTTON1_EventHandler(TM_BUTTON_PressType_t type);
 
 void read_ADC_led();
 int GetNumForDir(int startSq, const int dir, const int *board, const int us);
-int FindFourInARow(const int *board, const int ourindex, const int us);
+int FindFourInARow(int *board, const int ourindex, const int us);
 void InitialiseBoard(int *board) ;
 void PrintBoard(const int *board);
 int HasEmpty(const int *board);
@@ -40,5 +40,7 @@ void MakeMove(int *board, const int sq, const side);
 int GetComputerMove(const int *board);
 int GetHumanMove(const int *board);
 void RunGame();
-
+void DisplayCrusor( int on);
+void DisplayWinner( int *board, const int ourIndex, const int us, const int DirIndex);
+void EmptyPrintBoard();
 #endif /* TIC_TAC_TOE_H_ */

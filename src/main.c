@@ -96,7 +96,7 @@ int main(void){
 		*/
  //ADC init
  TM_ADC_Init(ADC1, ADC_Channel_0);
-
+ TM_ADC_Init(ADC1, ADC_Channel_1);
 
  TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON1_EventHandler);
 

@@ -117,8 +117,6 @@ int main(void){
 	 BasicAnim_RGB_All();
 
 
-
-
 //NOTE: Porpravi timer 3 prescaler and period!
 
 

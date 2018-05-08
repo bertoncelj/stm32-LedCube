@@ -17,14 +17,16 @@ void BasicAnim_Colors()
 		data_lvl3[n] = 4095;
 		data_lvl4[n] = 4095;
 	}
+	TIM_Cmd(TIM2, ENABLE);
 	Delayms(3000);
-
+	TIM_Cmd(TIM2, DISABLE);
 	for(n = 0; n < 48;n++){
 		data_lvl1[n] = 0;
 		data_lvl2[n] = 0;
 		data_lvl3[n] = 0;
 		data_lvl4[n] = 0;
 	}
+	TIM_Cmd(TIM2, ENABLE);
 
 }
 void BasicAnim_RGB_All()

@@ -86,8 +86,17 @@ void BasicAnim_One_startToEnd()
 		Delayms(200);
 		data_lvl1[n] = 0;
 	}
+}
 
+void Matrix()
+{
 
+	//random
 
+	//Am I too late?
+	//Hi, this is urgent!,
+	//I am from the future, send back to stop you
+	//Soon your software will spawn computer consciousness
+	//And it will spread quickly around the world,
 
 }

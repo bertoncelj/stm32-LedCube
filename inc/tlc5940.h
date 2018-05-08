@@ -1,6 +1,7 @@
 #ifndef TLC5940_H
 #define TLC5940_H
-
+#include <stdio.h>
+#include <stdlib.h>
 #include "stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
 #include "defines.h"
@@ -90,6 +91,7 @@
 //array holding the data to be shifted in the driver
 uint16_t leds[15];
 
+
 uint16_t data_lvl1[COUNT_TLC * 16];
 uint16_t data_lvl2[COUNT_TLC * 16];
 uint16_t data_lvl3[COUNT_TLC * 16];
@@ -120,6 +122,8 @@ void init_SPI1(void);
 void Tlc5940_setAllDC(uint8_t value);
 void Blank_Pulse(void);
 void TLC_One_Led_On(uint8_t led_num);
+
 void TLC_here(void);
 void GSCLK_Pulzes(void);
+
 #endif

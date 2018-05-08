@@ -1,3 +1,4 @@
+
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
 #include <stm32f4xx_gpio.h>
@@ -6,7 +7,10 @@
 #include <misc.h>
 #include "tm_stm32f4_delay.h"
 #include "tlc_animations.h"
+#include "tm_stm32f4_button.h"
 #include "tlc5940.h"
+#include "tic_tac_toe.h"
+
 
 /*
  * Pin configuration
@@ -35,6 +39,7 @@
 
 
 int timer_update=0;
+
 
 int main(void){
  SystemInit(); //168mhz
@@ -89,21 +94,36 @@ int main(void){
 				 Blank_Pulse();
 
 		*/
- 	//BasicAnim_Colors();
- 	//TLC_here();
+ //ADC init
+ TM_ADC_Init(ADC1, ADC_Channel_0);
+ TM_ADC_Init(ADC1, ADC_Channel_1);
+
+ TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON1_EventHandler);
+
  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
  while(1){
+	//BasicAnim_One_startToEnd();
+	//BasicAnim_Colors();
+	// Delayms(10000);
+
+	 Rungame_here();
 
 
-	 	BasicAnim_RGB_All();
-		BasicAnim_Colors();
+
+
+
+
+	 BasicAnim_RGB_All();
+
+
 
 
 //NOTE: Porpravi timer 3 prescaler and period!
 
 
 	 /*
+
 	 while(timer_update>20){
 
 		 	 data[15] +=16;

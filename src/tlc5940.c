@@ -11,13 +11,18 @@ void TLC_Pin_Init(void);
 //replace TIM2 with your desired Timer...
 void TIM3_IRQHandler(void)
 {
+    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	GPIO_SetPinHigh(GPIOD, GPIO_Pin_6);
+	GPIO_SetPinLow(GPIOD, GPIO_Pin_6);
 	 TLC_here();
+	 GPIO_SetPinHigh(GPIOD, GPIO_Pin_2);
+	 GPIO_SetPinLow(GPIOD, GPIO_Pin_2);
 	// GSCLK_Pulzes();
 }
 
 void GSCLK_Pulzes()
 {
-	TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	//TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 	int i;
 	TLC5940_GPIO->BSRRL = PIN_VPRG;
 	TLC5940_GPIO->BSRRH = PIN_VPRG;
@@ -44,10 +49,11 @@ void Timer_Init()
     NVIC_InitTypeDef NVIC_InitStructure;
 
     //init 1 ms timer
+    //NOTE: Frequency is 84 Mhz
     TIM_TimeBase_InitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBase_InitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBase_InitStructure.TIM_Period = 8399;
-    TIM_TimeBase_InitStructure.TIM_Prescaler = 200;
+    TIM_TimeBase_InitStructure.TIM_Period = 27;  	   //  27    za 20ms
+    TIM_TimeBase_InitStructure.TIM_Prescaler = 59999 ; // 59999
     TIM_TimeBaseInit(TIM3, &TIM_TimeBase_InitStructure);
 
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
@@ -315,6 +321,7 @@ void Tlc5940_setAllDC(uint8_t value)
 
 
 }
+
 void TLC_Update_lvl(uint16_t *data_lvl)
 {
 	uint8_t n;
@@ -332,9 +339,9 @@ void TLC_Update_lvl(uint16_t *data_lvl)
 		 SPI1_send(data_lvl[n+1]);
 	 }
 
-	 //_delay(1);
+	 _delay(1);
 	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_XLAT);
-	 //_delay(1);
+	 _delay(1);
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
 
@@ -342,15 +349,16 @@ void TLC_Update_lvl(uint16_t *data_lvl)
 	 //TIM_Cmd(TIM3, ENABLE);
 }
 
+
 void TLC_One_Led_On(uint8_t led_num)
 {
 	uint8_t n;
 	u16 data[COUNT_TLC* 16]={0x0000 ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000};
 
+
 	//TIM_Cmd(TIM3, DISABLE);
-
-
 	//GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
+
 	data[led_num] = 4095;
 	 //Test
 	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
@@ -372,6 +380,7 @@ void TLC_One_Led_On(uint8_t led_num)
 
 void TLC_here()
 {
+
 
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
 			TLC_Update_lvl(&data_lvl1[0]);

@@ -47,7 +47,7 @@ void Timer_Init()
     TIM_TimeBase_InitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBase_InitStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBase_InitStructure.TIM_Period = 8399;
-    TIM_TimeBase_InitStructure.TIM_Prescaler = 5;
+    TIM_TimeBase_InitStructure.TIM_Prescaler = 200;
     TIM_TimeBaseInit(TIM3, &TIM_TimeBase_InitStructure);
 
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);

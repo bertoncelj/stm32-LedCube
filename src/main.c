@@ -89,16 +89,16 @@ int main(void){
 				 Blank_Pulse();
 
 		*/
- 	BasicAnim_Colors();
- 	TLC_here();
+ 	//BasicAnim_Colors();
+ 	//TLC_here();
  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
  while(1){
 
 
-	 	//BasicAnim_RGB_All();
-		//BasicAnim_Colors();
-		//Delayms(10000);
+	 	BasicAnim_RGB_All();
+		BasicAnim_Colors();
+
 
 //NOTE: Porpravi timer 3 prescaler and period!
 

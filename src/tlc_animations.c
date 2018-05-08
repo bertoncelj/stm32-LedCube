@@ -16,14 +16,14 @@ void BasicAnim_Colors()
 		data_lvl3[n] = 4095;
 		data_lvl4[n] = 4095;
 	}
-	/*Delayms(3000);
+	Delayms(3000);
 	for(n = 0; n < 48;n++){
 		data_lvl1[n] = 0;
 		data_lvl2[n] = 0;
 		data_lvl3[n] = 0;
 		data_lvl4[n] = 0;
 	}
-	*/
+
 
 }
 void BasicAnim_RGB_All()

@@ -102,19 +102,21 @@ int main(void){
 
  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
+
+ int i;
+ data_lvl2[5] = 4095;
+ 		data_lvl2[5+16] = 4095;
+ 		data_lvl2[5+32] = 4095;
+
  while(1){
 	//BasicAnim_One_startToEnd();
 	//BasicAnim_Colors();
 	// Delayms(10000);
 
-	 Rungame_here();
+	// Rungame_here();
 
 
-
-
-
-
-	 BasicAnim_RGB_All();
+	// BasicAnim_RGB_All();
 
 
 //NOTE: Porpravi timer 3 prescaler and period!

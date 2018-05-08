@@ -16,4 +16,5 @@
 void BasicAnim_RGB_All();
 void BasicAnim_Colors();
 void BasicAnim_One_startToEnd();
+void Pin_on(int x, int y, int z, int color);
 #endif /* TLC_ANIMATIONS_H_ */

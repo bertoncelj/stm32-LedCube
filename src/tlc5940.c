@@ -327,7 +327,7 @@ void TLC_Update_lvl(uint16_t *data_lvl)
 	uint8_t n;
 	//u16 data[COUNT_TLC* 16]={0x0000 ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000};
 
-	TIM_Cmd(TIM3, DISABLE);
+	//TIM_Cmd(TIM3, DISABLE);
 
 
 	//GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
@@ -339,16 +339,16 @@ void TLC_Update_lvl(uint16_t *data_lvl)
 		 SPI1_send(data_lvl[n+1]);
 	 }
 
-	 _delay(10);
+	 _delay(1);
 	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_XLAT);
-	 _delay(10);
+	 _delay(1);
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
-	 _delay(10);
+	 _delay(1);
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
 
 
 	 GSCLK_Pulzes();
-	 TIM_Cmd(TIM3, ENABLE);
+	 //TIM_Cmd(TIM3, ENABLE);
 }
 
 
@@ -383,12 +383,12 @@ void TLC_One_Led_On(uint8_t led_num)
 void TLC_here()
 {
 
-	/*
+
 
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
 			TLC_Update_lvl(&data_lvl1[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_4);
-*/
+
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
 			TLC_Update_lvl(&data_lvl2[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_3);
@@ -396,11 +396,11 @@ void TLC_here()
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
 			TLC_Update_lvl(&data_lvl3[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_2);
-/*
+
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
 			TLC_Update_lvl(&data_lvl4[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_1);
-*/
+
 }
 
 

@@ -116,7 +116,7 @@ int main(void){
 	// Rungame_here();
 
 
-	// BasicAnim_RGB_All();
+	//BasicAnim_RGB_All();
 
 
 //NOTE: Porpravi timer 3 prescaler and period!

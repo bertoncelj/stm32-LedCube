@@ -114,10 +114,10 @@ int main(void){
 	// Delayms(10000);
 
 	// Rungame_here();
-
+	 Pin_on(0, 0, 0, 0xCB3535);
 
 	//BasicAnim_RGB_All();
-
+	 BasicAnim_RGB_All();
 
 //NOTE: Porpravi timer 3 prescaler and period!
 

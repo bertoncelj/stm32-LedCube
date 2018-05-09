@@ -105,8 +105,8 @@ int main(void){
 
  int i;
  data_lvl2[5] = 4095;
- 		data_lvl2[5+16] = 4095;
- 		data_lvl2[5+32] = 4095;
+ data_lvl2[5+16] = 4095;
+ data_lvl2[5+32] = 4095;
 
  while(1){
 	//BasicAnim_One_startToEnd();

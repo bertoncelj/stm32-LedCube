@@ -28,6 +28,9 @@ void Pin_on(int x, int y, int z, int color)
 	int color_g = color >> 8 & 0xFF;
 	int color_b = color & 0xFF;
 
+	color_r = (color_r*4095)/255;
+	color_g = (color_g*4095)/255;
+	color_b = (color_b*4095)/255;
 	switch(z){
 	case 0:
 		data_lvl1[LedArray3D[x][y] + 0] = color_r;

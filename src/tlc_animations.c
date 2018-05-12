@@ -175,8 +175,6 @@ void Anim_Quatro_4Squars_Infinity(){
 	int i = 0;
 	int a = 0;
 
-
-
 		for(i = 0; i < 3; i=i+2){
 			for(a = 0; a < 9; a++){
 				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 1+i, ROSE, arr_seq1[a]);
@@ -210,18 +208,98 @@ void Anim_Quatro_4Squars_Infinity(){
 	    	Delayms(delay_time);
 	    	DeleteAllLeds();
 		}
-		/*
-		Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2,  ROSE, 0);
-		Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3,  ROSE, 0);
-		Update_array_leds(arr_two, sizeof(arr_two)/sizeof(int), 2,  LGREEN, 8);
-		Update_array_leds(arr_two, sizeof(arr_two)/sizeof(int), 3,  LGREEN, 8);
-
-		Delayms(delay_time);
-		DeleteAllLeds();
-		*/
 
 }
 
+void Anim_TrikotDriveBy(Direction dir, int color)
+{
+	int delay_time = 170;
+	//Going up
+	Update_enaVrstica(0, dir, color, 1);
+	Delayms(delay_time);
+
+	Update_enaVrstica(1, dir, color, 1);
+	Update_enaVrstica(0, dir, color, 2);
+	Delayms(delay_time);
+
+	Update_enaVrstica(0, dir, color, 3);
+	Update_enaVrstica(1, dir, color, 2);
+	Update_enaVrstica(2, dir, color, 1);
+	Delayms(delay_time);
+
+	Update_enaVrstica(0, dir, color, 4);
+	Update_enaVrstica(1, dir, color, 3);
+	Update_enaVrstica(2, dir, color, 2);
+	Update_enaVrstica(3, dir, color, 1);
+	Delayms(delay_time);
+
+	//moving through the midle
+	Update_enaVrstica(0, dir, 0, 4);
+	Update_enaVrstica(1, dir, color, 4);
+	Update_enaVrstica(2, dir, color, 3);
+	Update_enaVrstica(3, dir, color, 2);
+	Delayms(delay_time);
+
+	Update_enaVrstica(0, dir, 0, 3);
+	Update_enaVrstica(1, dir, 0, 4);
+	Update_enaVrstica(2, dir, color, 4);
+	Update_enaVrstica(3, dir, color, 3);
+	Delayms(delay_time);
+
+	Update_enaVrstica(0, dir, 0, 2);
+	Update_enaVrstica(1, dir, 0, 3);
+	Update_enaVrstica(2, dir, 0, 4);
+	Update_enaVrstica(3, dir, color, 4);
+	Delayms(delay_time);
+
+	//down
+
+	Update_enaVrstica(0, dir, 0, 1);
+	Update_enaVrstica(1, dir, 0, 2);
+	Update_enaVrstica(2, dir, 0, 3);
+	Update_enaVrstica(3, dir, 0, 4);
+	Delayms(delay_time);
+
+
+	Update_enaVrstica(1, dir, 0, 1);
+	Update_enaVrstica(2, dir, 0, 2);
+	Update_enaVrstica(3, dir, 0, 3);
+	Delayms(delay_time);
+
+
+	Update_enaVrstica(2, dir, 0, 1);
+	Update_enaVrstica(3, dir, 0, 2);
+	Delayms(delay_time);
+
+
+	Update_enaVrstica(3, dir, 0, 1);
+	Delayms(delay_time);
+}
+
+void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl)
+{
+	int i=0;
+	int color_r = color >> 16;
+	int color_g = color >> 8 & 0xFF;
+	int color_b = color & 0xFF;
+
+	color_r = (color_r*4095)/255;
+	color_g = (color_g*4095)/255;
+	color_b = (color_b*4095)/255;
+
+
+	//DeleteAllLeds();
+	if(dir  == STOLPEC){
+		for(i = 0; i < 4; i++){
+			Update_me(LedArrayOneLvl2D[i][draw_st_vr], color_r, color_g, color_b, lvl);
+		}
+	} else {
+		for(i = 0; i < 4; i++){
+			Update_me(LedArrayOneLvl2D[draw_st_vr][i], color_r, color_g, color_b, lvl);
+		}
+	}
+
+}
 
 void Wall(int draw_st_vr, Direction dir, int color)
 {
@@ -259,9 +337,7 @@ void Anime_Wall( count_dir count_func, Direction dir)
 		Delayms(120);
 
 	}
-
 }
-
 
 void count(int start, int end, int step) {
 
@@ -305,6 +381,36 @@ void Anim_Loytra(int x, int y, int z, int color)
 	}
 
 }
+
+void Update_me(int pin,int color_r,int color_g,int color_b, int lvl)
+{
+	switch(lvl){
+		case 1:
+			data_lvl1[pin + 0] = color_r;
+			data_lvl1[pin + 16] = color_g;
+			data_lvl1[pin + 32] = color_b;
+		break;
+
+		case 2:
+			data_lvl2[pin + 0] = color_r;
+			data_lvl2[pin + 16] = color_g;
+			data_lvl2[pin + 32] = color_b;
+		break;
+
+		case 3:
+			data_lvl3[pin + 0] = color_r;
+			data_lvl3[pin + 16] = color_g;
+			data_lvl3[pin + 32] = color_b;
+		break;
+
+		case 4:
+			data_lvl4[pin + 0] = color_r;
+			data_lvl4[pin + 16] = color_g;
+			data_lvl4[pin + 32] = color_b;
+		break;
+		};
+}
+
 
 void Update_array_leds(int *arr, int length, int layer, int color, int shift)
 {

@@ -108,7 +108,8 @@ int i;
 int del_time = 2000;
  while(1){
 
-	  Anim_Quatro_4Squars_Infinity();
+	 Anim_TrikotDriveBy(STOLPEC, ROSE);
+	 Anim_TrikotDriveBy(VRSTICA, BLUE);
 	// Delayms(del_time);
 	//BasicAnim_RGB_All();
 	 //BasicAnim_RGB_All();

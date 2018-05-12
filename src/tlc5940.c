@@ -28,7 +28,9 @@ void GSCLK_Pulzes()
 	TLC5940_GPIO->BSRRH = PIN_VPRG;
 	for (i = 0; i < 4096; i++){
 		 		TLC5940_GPIO->BSRRL = PIN_GSCLK;
+
 		 		TLC5940_GPIO->BSRRH = PIN_GSCLK;
+
 		 				}
 		 Blank_Pulse();
 
@@ -165,7 +167,7 @@ void TLC_Pin_Init(void)
     SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low; // clock is low when idle
     SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge; // data sampled at first edge
     SPI_InitStruct.SPI_NSS = SPI_NSS_Soft | SPI_NSSInternalSoft_Set; // set the NSS management to internal and pull internal NSS high
-    SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16; // SPI frequency is APB2 frequency / 4
+    SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2; // SPI frequency is APB2 frequency / 4
     SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;// data is transmitted MSB first
     SPI_Init(SPI1, &SPI_InitStruct);
 
@@ -325,6 +327,7 @@ void Tlc5940_setAllDC(uint8_t value)
 void TLC_Update_lvl(uint16_t *data_lvl)
 {
 	uint8_t n;
+	uint8_t tim = 10;
 	//u16 data[COUNT_TLC* 16]={0x0000 ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000};
 
 	//TIM_Cmd(TIM3, DISABLE);
@@ -333,22 +336,23 @@ void TLC_Update_lvl(uint16_t *data_lvl)
 	//GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
 	 //Test
 	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
+	 _delay(tim);
 	 for(n=0; n<(COUNT_TLC *16); n=n+2){
 		 SPI1_send(data_lvl[n]>>4);
 		 SPI1_send((data_lvl[n]<<4) | (data_lvl[n+1])>>8);
 		 SPI1_send(data_lvl[n+1]);
 	 }
 
-	 _delay(1);
+	 _delay(tim);
 	 GPIO_SetPinHigh(TLC5940_GPIO,PIN_XLAT);
-	 _delay(1);
+	 _delay(tim);
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
-	 _delay(1);
+	 _delay(tim);
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
-
+	 _delay(tim);
 
 	 GSCLK_Pulzes();
-	 //TIM_Cmd(TIM3, ENABLE);
+	// TIM_Cmd(TIM3, ENABLE);
 }
 
 
@@ -497,7 +501,7 @@ SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b; // one packet of data is 8 bits w
 SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low; // clock is low when idle
 SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge; // data sampled at first edge
 SPI_InitStruct.SPI_NSS = SPI_NSS_Soft | SPI_NSSInternalSoft_Set; // set the NSS management to internal and pull internal NSS high
-SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; // SPI frequency is APB2 frequency / 4
+SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32; // SPI frequency is APB2 frequency / 4
 SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;// data is transmitted MSB first
 SPI_Init(SPI1, &SPI_InitStruct);
 

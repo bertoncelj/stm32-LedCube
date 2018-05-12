@@ -95,24 +95,21 @@ int main(void){
 
 		*/
  //ADC init
- TM_ADC_Init(ADC1, ADC_Channel_0);
- TM_ADC_Init(ADC1, ADC_Channel_1);
+ //TM_ADC_Init(ADC1, ADC_Channel_4);
+ //TM_ADC_Init(ADC1, ADC_Channel_1);
+ //TM_ADC_Init(ADC1, ADC_Channel_2);
 
- TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON1_EventHandler);
+ //TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON1_EventHandler);
 
  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
-
-
-
+int i;
+// Anim_Loytra(0,0,0, ROZI);
+int del_time = 2000;
  while(1){
-	//BasicAnim_One_startToEnd();
-	//BasicAnim_Colors();
-	// Delayms(10000);
 
-	// Rungame_here();
-	 Pin_on(0, 0, 0, 0xffaa00);
-
+	 Anim_Quatro_2Squars_Infinity();
+	// Delayms(del_time);
 	//BasicAnim_RGB_All();
 	 //BasicAnim_RGB_All();
 

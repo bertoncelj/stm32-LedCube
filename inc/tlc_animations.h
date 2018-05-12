@@ -22,6 +22,13 @@
 #define ROSE 		0xFF1493
 #define LGREEN 		0x98FB98
 
+
+//Define dir za Trikotnik DriveBy
+#define NAPREJ 0
+#define NAZAJ 3
+#define NAPREJ_P 1
+#define NAPREJ_N -1
+
 typedef enum {
 	STOLPEC, VRSTICA
 } Direction;
@@ -44,7 +51,7 @@ void Mlin();
 
 
 /*Animacije*/
-void Anim_TrikotDriveBy(Direction dir,int color);
+void Anim_TrikotDriveBy(Direction dir, int a, int color);
 void Anim_Quatro_2Squars_Infinity();
 void Anim_Quatro_4Squars_Infinity();
 void Anime_Wall( count_dir count_func, Direction dir);

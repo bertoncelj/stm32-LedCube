@@ -108,10 +108,20 @@ int i;
 int del_time = 2000;
  while(1){
 
-	 Anim_TrikotDriveBy(STOLPEC, ROSE);
-	 Anim_TrikotDriveBy(VRSTICA, BLUE);
-	// Delayms(del_time);
-	//BasicAnim_RGB_All();
+	// BasicAnim_Colors();
+	// BasicAnim_One_startToEnd();
+	// Anim_Quatro_2Squars_Infinity();
+	// Anim_Quatro_4Squars_Infinity();
+	// Anime_Wall( count_up, STOLPEC);
+	// Anime_Wall( count_up, VRSTICA);
+	// Anime_Wall( count_down, STOLPEC);
+	// Anime_Wall( count_down, VRSTICA);
+	 Anim_TrikotDriveBy(STOLPEC,NAPREJ, ROSE);
+	 Anim_TrikotDriveBy(VRSTICA,NAPREJ, ROSE);
+	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, ROSE);
+	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, ROSE);
+
+	// BasicAnim_RGB_All();
 	 //BasicAnim_RGB_All();
 
 //NOTE: Porpravi timer 3 prescaler and period!

@@ -51,7 +51,7 @@ void Mlin();
 
 
 /*Animacije*/
-void Anim_TrikotDriveBy(Direction dir, int a, int color);
+void Anim_TrikotDriveBy(Direction dir, int a, int lvl_sp, int color);
 void Anim_Quatro_2Squars_Infinity();
 void Anim_Quatro_4Squars_Infinity();
 void Anime_Wall( count_dir count_func, Direction dir);

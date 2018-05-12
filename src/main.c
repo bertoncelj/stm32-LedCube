@@ -116,10 +116,15 @@ int del_time = 2000;
 	// Anime_Wall( count_up, VRSTICA);
 	// Anime_Wall( count_down, STOLPEC);
 	// Anime_Wall( count_down, VRSTICA);
-	 Anim_TrikotDriveBy(STOLPEC,NAPREJ, ROSE);
-	 Anim_TrikotDriveBy(VRSTICA,NAPREJ, ROSE);
-	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, ROSE);
-	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, ROSE);
+	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, ROSE);
+	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,1, ROSE);
+	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 1, ROSE);
+	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 1, ROSE);
+
+	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,4, BLUE);
+	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, BLUE);
+	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, BLUE);
+	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, BLUE);
 
 	// BasicAnim_RGB_All();
 	 //BasicAnim_RGB_All();

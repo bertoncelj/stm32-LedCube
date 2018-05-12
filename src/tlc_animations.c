@@ -211,73 +211,78 @@ void Anim_Quatro_4Squars_Infinity(){
 
 }
 
-void Anim_TrikotDriveBy(Direction dir, int a, int color)
+void Anim_TrikotDriveBy(Direction dir, int a, int lvl_sp, int color)
 {
 	int delay_time = 100;
 	int shf;
+	int shf_lvl;
 	//Comment
 	if(a == NAPREJ) shf = 1;
 	if(a == NAZAJ)  shf = -1;
 
+	//Nastima shift za lvl
+	if(lvl_sp == 4) shf_lvl = -1;
+	if(lvl_sp == 1)  shf_lvl = 1;
 
-	Update_enaVrstica(a, 			dir, color, 1);
+
+	Update_enaVrstica(a, 			dir, color, lvl_sp);
 	Delayms(delay_time);
 
-	Update_enaVrstica(a, 			dir, color, 2);
-	Update_enaVrstica(a + shf, 		dir, color, 1);
+	Update_enaVrstica(a, 			dir, color, lvl_sp + shf_lvl);
+	Update_enaVrstica(a + shf, 		dir, color, lvl_sp);
 	Delayms(delay_time);
 
-	Update_enaVrstica(a, 			dir, color, 3);
-	Update_enaVrstica(a+shf, 		dir, color, 2);
-	Update_enaVrstica(a+(shf*2), 	dir, color, 1);
+	Update_enaVrstica(a, 			dir, color, lvl_sp + (2*shf_lvl));
+	Update_enaVrstica(a+shf, 		dir, color, lvl_sp + shf_lvl);
+	Update_enaVrstica(a+(shf*2), 	dir, color, lvl_sp);
 	Delayms(delay_time);
 
-	Update_enaVrstica(a, 			dir, color, 4);
-	Update_enaVrstica(a + shf, 		dir, color, 3);
-	Update_enaVrstica(a + (shf*2), 	dir, color, 2);
-	Update_enaVrstica(a + (shf*3), 	dir, color, 1);
+	Update_enaVrstica(a, 			dir, color, lvl_sp + (3*shf_lvl));
+	Update_enaVrstica(a + shf, 		dir, color, lvl_sp + (2*shf_lvl));
+	Update_enaVrstica(a + (shf*2), 	dir, color, lvl_sp + shf_lvl);
+	Update_enaVrstica(a + (shf*3), 	dir, color, lvl_sp);
 	Delayms(delay_time);
 
 	//moving through the midle
-	Update_enaVrstica(a , 			dir, 0, 4);
-	Update_enaVrstica(a + shf, 		dir, color, 4);
-	Update_enaVrstica(a + (2*shf), 	dir, color, 3);
-	Update_enaVrstica(a + (3*shf), 	dir, color, 2);
+	Update_enaVrstica(a , 			dir, 0,     lvl_sp + (3*shf_lvl));
+	Update_enaVrstica(a + shf, 		dir, color, lvl_sp + (3*shf_lvl));
+	Update_enaVrstica(a + (2*shf), 	dir, color, lvl_sp + (2*shf_lvl));
+	Update_enaVrstica(a + (3*shf), 	dir, color, lvl_sp + shf_lvl);
 	Delayms(delay_time);
 
-	Update_enaVrstica(a,			dir, 0, 3);
-	Update_enaVrstica(a + shf,		dir, 0, 4);
-	Update_enaVrstica(a + (2*shf),	dir, color, 4);
-	Update_enaVrstica(a + (3*shf), 	dir, color, 3);
+	Update_enaVrstica(a,			dir, 0, lvl_sp + (2*shf_lvl));
+	Update_enaVrstica(a + shf,		dir, 0, lvl_sp + (3*shf_lvl));
+	Update_enaVrstica(a + (2*shf),	dir, color, lvl_sp + (3*shf_lvl));
+	Update_enaVrstica(a + (3*shf), 	dir, color, lvl_sp + (2*shf_lvl));
 	Delayms(delay_time);
 
-	Update_enaVrstica(a, 			dir, 0, 2);
-	Update_enaVrstica(a + shf,	 	dir, 0, 3);
-	Update_enaVrstica(a + (2*shf),  dir, 0, 4);
-	Update_enaVrstica(a + (3*shf),  dir, color, 4);
+	Update_enaVrstica(a, 			dir, 0, lvl_sp + shf_lvl);
+	Update_enaVrstica(a + shf,	 	dir, 0, lvl_sp + (2*shf_lvl));
+	Update_enaVrstica(a + (2*shf),  dir, 0, lvl_sp + (3*shf_lvl));
+	Update_enaVrstica(a + (3*shf),  dir, color, lvl_sp + (3*shf_lvl));
 	Delayms(delay_time);
 
 	//down
 
-	Update_enaVrstica(a, 			dir, 0, 1);
-	Update_enaVrstica(a + shf, 		dir, 0, 2);
-	Update_enaVrstica(a + (2*shf), 	dir, 0, 3);
-	Update_enaVrstica(a + (3*shf),	dir, 0, 4);
+	Update_enaVrstica(a, 			dir, 0, lvl_sp);
+	Update_enaVrstica(a + shf, 		dir, 0, lvl_sp + shf_lvl);
+	Update_enaVrstica(a + (2*shf), 	dir, 0, lvl_sp + (2*shf_lvl));
+	Update_enaVrstica(a + (3*shf),	dir, 0, lvl_sp + (3*shf_lvl));
 	Delayms(delay_time);
 
 
-	Update_enaVrstica(a + shf, 		dir, 0, 1);
-	Update_enaVrstica(a + (2*shf),	dir, 0, 2);
-	Update_enaVrstica(a + (3*shf), 	dir, 0, 3);
+	Update_enaVrstica(a + shf, 		dir, 0, lvl_sp);
+	Update_enaVrstica(a + (2*shf),	dir, 0, lvl_sp + shf_lvl);
+	Update_enaVrstica(a + (3*shf), 	dir, 0, lvl_sp + (2*shf_lvl));
 	Delayms(delay_time);
 
 
-	Update_enaVrstica(a + (2*shf),	 dir, 0, 1);
-	Update_enaVrstica(a + (3*shf),	dir, 0, 2);
+	Update_enaVrstica(a + (2*shf),	 dir, 0,     lvl_sp);
+	Update_enaVrstica(a + (3*shf),	dir, 0,  lvl_sp + shf_lvl);
 	Delayms(delay_time);
 
 
-	Update_enaVrstica(a + (3*shf),	 dir, 0, 1);
+	Update_enaVrstica(a + (3*shf),	 dir, 0, lvl_sp);
 	Delayms(delay_time);
 }
 

@@ -139,10 +139,10 @@ void Anim_Quatro_2Squars_Infinity(){
 	int delay_time = 1000;
 	int arr_one[4] = {0,1,4,5};
 	int arr_two[4] = {2,3,6,7};
-	int arr_seq[20] ={0,8,4,4,8,0,9,-1,10,-2,6,2,2,6,1,7,0,8,0,8};
-	int i = 0;
-	int a = 0;
+	int arr_seq[20] = {0,8,4,4,8,0,9,-1,10,-2,6,2,2,6,1,7,0,8,0,8};
 
+	int a = 0;
+	int i = 0;
 
 	for(i = 0; i < 3; i=i+2){
 		for(a = 0; a < 17; a=a+2){
@@ -163,6 +163,65 @@ void Anim_Quatro_2Squars_Infinity(){
 		DeleteAllLeds();
 	}
 }
+
+void Anim_Quatro_4Squars_Infinity(){
+
+	int delay_time = 240;
+	int arr_one[4] = {0,1,4,5};
+	int arr_seq1[10] = {0,4,8, 9,10,6,2,1,0};
+	int arr_seq2[10] = {8, 9,10,6,2,1,0,4,8};
+	int arr_seq3[10] = {2,1,0,4,8, 9,10,6,2};
+	int arr_seq4[10] = {10,6,2,1,0,4,8, 9,10};
+	int i = 0;
+	int a = 0;
+
+
+
+		for(i = 0; i < 3; i=i+2){
+			for(a = 0; a < 9; a++){
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 1+i, ROSE, arr_seq1[a]);
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2+i, ROSE, arr_seq1[a]);
+
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3-i, SVETLOMODRA, arr_seq2[a]);
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 4-i, SVETLOMODRA, arr_seq2[a]);
+
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3-i, YELLOW, arr_seq3[a]);
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 4-i, YELLOW, arr_seq3[a]);
+
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 1+i, LGREEN, arr_seq4[a]);
+				Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2+i, LGREEN, arr_seq4[a]);
+
+
+				Delayms(delay_time);
+				DeleteAllLeds();
+			}
+			Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2, ROSE, 0);
+			Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3, ROSE, 0);
+
+			Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3, SVETLOMODRA, 8);
+			Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2, SVETLOMODRA, 8);
+
+			Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3, YELLOW, 2);
+			Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2, YELLOW, 2);
+
+			Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3, LGREEN, 10);
+	        Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2, LGREEN, 10);
+
+	    	Delayms(delay_time);
+	    	DeleteAllLeds();
+		}
+		/*
+		Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 2,  ROSE, 0);
+		Update_array_leds(arr_one, sizeof(arr_one)/sizeof(int), 3,  ROSE, 0);
+		Update_array_leds(arr_two, sizeof(arr_two)/sizeof(int), 2,  LGREEN, 8);
+		Update_array_leds(arr_two, sizeof(arr_two)/sizeof(int), 3,  LGREEN, 8);
+
+		Delayms(delay_time);
+		DeleteAllLeds();
+		*/
+
+}
+
 
 void Wall(int draw_st_vr, Direction dir, int color)
 {

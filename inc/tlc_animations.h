@@ -40,7 +40,8 @@ void Wall(int draw_st_vr, Direction dir, int color);
 
 
 /*Animacije*/
-void Quatro();
+void Anim_Quatro_2Squars_Infinity();
+void Anim_Quatro_4Squars_Infinity();
 void Anime_Wall( count_dir count_func, Direction dir);
 void Anim_Loytra(int x, int y, int z, int color);
 

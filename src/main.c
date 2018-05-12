@@ -108,7 +108,7 @@ int i;
 int del_time = 2000;
  while(1){
 
-	 Anim_Quatro_2Squars_Infinity();
+	  Anim_Quatro_4Squars_Infinity();
 	// Delayms(del_time);
 	//BasicAnim_RGB_All();
 	 //BasicAnim_RGB_All();

@@ -215,12 +215,12 @@ void Anim_TrikotDriveBy(Direction dir, int a, int color)
 {
 	int delay_time = 100;
 	int shf;
-
+	//Comment
 	if(a == NAPREJ) shf = 1;
 	if(a == NAZAJ)  shf = -1;
 
 
-	Update_enaVrstica(a, 		dir, color, 1);
+	Update_enaVrstica(a, 			dir, color, 1);
 	Delayms(delay_time);
 
 	Update_enaVrstica(a, 			dir, color, 2);

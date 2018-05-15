@@ -10,6 +10,9 @@
 
 #include "tlc5940.h"
 #include "tm_stm32f4_delay.h"
+#include <math.h>
+#include <misc.h>
+
 
 #define RED		0xFF0000
 #define GREEN 	0x00FF00
@@ -34,6 +37,9 @@ typedef enum {
 } Direction;
 
 
+
+
+
 typedef int (*count_dir)(int curr_idx, int count_to);
 
 int count_up(int curr_idx, int count_to);
@@ -56,6 +62,7 @@ void Anim_Quatro_2Squars_Infinity();
 void Anim_Quatro_4Squars_Infinity();
 void Anime_Wall( count_dir count_func, Direction dir);
 void Anim_Loytra(int x, int y, int z, int color);
+void Anim_matrix();
 
 /*Leds on/off*/
 void Pin_on(int x, int y, int z, int color);

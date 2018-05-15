@@ -8,7 +8,19 @@
 
 #include "tlc_animations.h"
 
+struct RGB
+{
+	unsigned char R;
+	unsigned char G;
+	unsigned char B;
+};
 
+struct HSV
+{
+	double H;
+	double S;
+	double V;
+};
 
 
 int count_up(int curr_idx, int count_to)
@@ -60,9 +72,92 @@ const int LedArrayOneLvl2D[4][4] = {
  *
  *  b_ 0
  */
+
+
+struct RGB HSVToRGB(struct HSV *hsv) {
+	double r = 0, g = 0, b = 0;
+	double d;
+	if (hsv->S == 0)
+	{
+		r = hsv->V;
+		g = hsv->V;
+		b = hsv->V;
+	}
+	else
+	{
+		int i;
+		double f, p, q, t;
+
+		if (hsv->H == 360)
+			hsv->H = 0;
+		else
+			hsv->H = hsv->H / 60;
+		d = hsv->H;
+		d *= 10.;
+		int j = d;
+		d = (double) j / 10.;
+
+		i = (int)trunc(d);
+		f = hsv->H - i;
+
+		p = hsv->V * (1.0 - hsv->S);
+		q = hsv->V * (1.0 - (hsv->S * f));
+		t = hsv->V * (1.0 - (hsv->S * (1.0 - f)));
+
+		switch (i)
+		{
+		case 0:
+			r = hsv->V;
+			g = t;
+			b = p;
+			break;
+
+		case 1:
+			r = q;
+			g = hsv->V;
+			b = p;
+			break;
+
+		case 2:
+			r = p;
+			g = hsv->V;
+			b = t;
+			break;
+
+		case 3:
+			r = p;
+			g = q;
+			b = hsv->V;
+			break;
+
+		case 4:
+			r = t;
+			g = p;
+			b = hsv->V;
+			break;
+
+		default:
+			r = hsv->V;
+			g = p;
+			b = q;
+			break;
+		}
+
+	}
+
+	struct RGB rgb;
+	rgb.R = r * 255;
+	rgb.G = g * 255;
+	rgb.B = b * 255;
+
+	return rgb;
+}
+
+
+
 void Pin_on_figurOutColors(int x, int y, int z)
 {
-	int color_r = 0;
+	int color_r = TM_ADC_Read(ADC1, ADC_Channel_0);
 	int color_g = TM_ADC_Read(ADC1, ADC_Channel_1);
 	int color_b = TM_ADC_Read(ADC1, ADC_Channel_2);
 
@@ -286,6 +381,24 @@ void Anim_TrikotDriveBy(Direction dir, int a, int lvl_sp, int color)
 	Delayms(delay_time);
 }
 
+
+void Anim_matrix(){
+
+	//TM_RNG_Init();
+	//int randMove;
+	//int i;
+	//int array_RGB[3];
+
+
+	struct HSV data = { 154, 0.43, 0.60 };
+	struct RGB value =HSVToRGB(&data);
+
+	Update_All_Layers(0, value.R, value.G, value.B);
+
+
+	//TM_RNG_DeInit();
+}
+
 void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl)
 {
 	int i=0;
@@ -425,6 +538,7 @@ void Update_me(int pin,int color_r,int color_g,int color_b, int lvl)
 void Update_array_leds(int *arr, int length, int layer, int color, int shift)
 {
 	int i;
+
 	int color_r = color >> 16;
 	int color_g = color >> 8 & 0xFF;
 	int color_b = color & 0xFF;

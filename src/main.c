@@ -12,6 +12,7 @@
 #include "tic_tac_toe.h"
 
 
+
 /*
  * Pin configuration
  *
@@ -95,9 +96,9 @@ int main(void){
 
 		*/
  //ADC init
- //TM_ADC_Init(ADC1, ADC_Channel_4);
- //TM_ADC_Init(ADC1, ADC_Channel_1);
- //TM_ADC_Init(ADC1, ADC_Channel_2);
+   TM_ADC_Init(ADC1, ADC_Channel_0);
+   TM_ADC_Init(ADC1, ADC_Channel_1);
+   TM_ADC_Init(ADC1, ADC_Channel_2);
 
  //TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON1_EventHandler);
 
@@ -106,8 +107,11 @@ int main(void){
 int i;
 // Anim_Loytra(0,0,0, ROZI);
 int del_time = 2000;
+float yolo = 2.5;
+uint8_t aa = 1;
  while(1){
-
+	 yolo = sin(aa);
+	Anim_matrix();
 	// BasicAnim_Colors();
 	// BasicAnim_One_startToEnd();
 	// Anim_Quatro_2Squars_Infinity();
@@ -116,6 +120,8 @@ int del_time = 2000;
 	// Anime_Wall( count_up, VRSTICA);
 	// Anime_Wall( count_down, STOLPEC);
 	// Anime_Wall( count_down, VRSTICA);
+
+	 /*
 	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, ROSE);
 	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,1, ROSE);
 	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 1, ROSE);
@@ -125,6 +131,8 @@ int del_time = 2000;
 	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, BLUE);
 	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, BLUE);
 	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, BLUE);
+	 */
+
 
 	// BasicAnim_RGB_All();
 	 //BasicAnim_RGB_All();

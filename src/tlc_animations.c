@@ -189,7 +189,10 @@ void Pin_on_figurOutColors(int x, int y, int z)
 
 }
 
-
+/*
+ * @brif: positions 0 -> 3, color -> 0xFF12AB
+ *
+ * */
 void Pin_on(int x, int y, int z, int color)
 {
 
@@ -224,6 +227,31 @@ void Pin_on(int x, int y, int z, int color)
 	case 3:
 		data_lvl4[LedArrayOneLvl2D[x][y] + 0] = color_r;
 		data_lvl4[LedArrayOneLvl2D[x][y] + 16] = color_g;
+		data_lvl4[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+	};
+}
+
+void Pin_on_crusor(int x, int y, int z, int on_off)
+{
+	int color_b;
+	if(on_off == 1)color_b = 4094;
+	if(on_off == 0)color_b = 0;
+
+	switch(z){
+	case 0:
+		data_lvl1[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+
+	case 1:
+		data_lvl2[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+
+	case 2:
+		data_lvl3[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+
+	case 3:
 		data_lvl4[LedArrayOneLvl2D[x][y] + 32] = color_b;
 	break;
 	};

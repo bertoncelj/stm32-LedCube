@@ -1,4 +1,5 @@
 
+#include "defines.h"
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
 #include <stm32f4xx_gpio.h>
@@ -8,8 +9,11 @@
 #include "tm_stm32f4_delay.h"
 #include "tlc_animations.h"
 #include "tm_stm32f4_button.h"
+#include "tm_stm32f4_hd44780.h"
 #include "tlc5940.h"
 #include "tic_tac_toe.h"
+#include <stdio.h>
+
 
 
 
@@ -50,9 +54,10 @@ int main(void){
  TM_DELAY_Init();
  // MCO2_INIT();
 
- uint_fast8_t n;
- //LED0
- u16 data[COUNT_TLC* 16]={0x0000 ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000};
+ //LCD INIT
+ TM_HD44780_Init(16, 2);
+ TM_HD44780_Puts(0, 0, "Hell");
+
 
  Tlc5940_setAllDC(63);	//max 63
  //GPIO_SetPinLow(TLC5940_GPIO,PIN_LEVEL_1);
@@ -95,23 +100,21 @@ int main(void){
 				 Blank_Pulse();
 
 		*/
- //ADC init
+ //TODO: PRESTAV VSE V TM INIT FUNCKIJE
+   TM_ADC_Init(ADC1, ADC_Channel_4);
    TM_ADC_Init(ADC1, ADC_Channel_0);
    TM_ADC_Init(ADC1, ADC_Channel_1);
    TM_ADC_Init(ADC1, ADC_Channel_2);
 
- //TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON1_EventHandler);
+  TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON_OK_EventHandler);
 
  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
  TIM_Cmd(TIM3, ENABLE);
-int i;
-// Anim_Loytra(0,0,0, ROZI);
-int del_time = 2000;
-float yolo = 2.5;
-uint8_t aa = 1;
+
  while(1){
-	 yolo = sin(aa);
-	Anim_matrix();
+	 menu();
+	 //Rungame_here();
+
 	// BasicAnim_Colors();
 	// BasicAnim_One_startToEnd();
 	// Anim_Quatro_2Squars_Infinity();

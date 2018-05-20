@@ -6,10 +6,15 @@
  */
 
 #include "tic_tac_toe.h"
+#include "tlc_animations.h"
 
 int led_value_16;
-int led_value_lvl;
-int led_button_choosen;
+int led_value_adc_x;
+int led_value_adc_y;
+int led_value_adc_z;
+
+
+uint8_t flag_cursor_read_ADC_values;
 /*
 int board[25] = {
 	:,:,:,:,:,
@@ -55,144 +60,175 @@ int board[25] = {
 }
 */
 								   //   dol dpos dpos-, diag
-const int Directions[9] = { 1, 6, 5, 7, 36, 37, 35, 43, 41};
+const int Directions[11] = { 1, 6, 5, 7, 36, 37, 35, 43, 41, 42, 30};
 
 //NOTE: REVERSE TO MATCH LED DIRECTIONS
 const int ConvertTo36_4[16*4] = {
-	10, 9, 8,7,
+	7, 8, 9, 10,
 	13,14,15,16,
-	22,21,20,19,
+	19,20,21,22,
 	25,26,27,28,
 
-	46,45,44,43,
+	43,44,45,46,
 	49,50,51,52,
-	58,57,56,55,
+	55,56,57,58,
 	61,62,63,64,
 
-	83,82,81,80,
+	79,80,81,82,
 	85,86,87,88,
-	94,93,92,91,
+	91,92,93,94,
 	97,98,99,100,
 
-	118,117,116,115,
+	115,116,117,118,
 	121,122,123,124,
-	130,129,128,127,
+	127,128,129,130,
 	133,134,135,136
-
 };
 
 const int LedArray3D_TicTacToe[4][4][4] = {
 	{
-		{10, 9, 8,7},
+		{7, 8, 9, 10},
 		{13,14,15,16},
-		{22,21,20,19},
+		{19,20,21,22},
 		{25,26,27,28}
 	},
 	{
-		{46,45,44,43},
+		{43,44,45,46},
 		{49,50,51,52},
-		{58,57,56,55},
+		{55,56,57,58},
 		{61,62,63,64}
 	},
 	{
-		{83,82,81,80},
+		{79,80,81,82},
 		{85,86,87,88},
-		{94,93,92,91},
+		{91,92,93,94},
 		{97,98,99,100}
 	},
 	{
-		{118,117,116,115},
+		{115,116,117,118},
 		{121,122,123,124},
-		{130,129,128,127},
+		{127,128,129,130},
 		{133,134,135,136}
 	},
 };
-void BUTTON1_EventHandler(TM_BUTTON_PressType_t type) {
+
+void BUTTON_OK_EventHandler(TM_BUTTON_PressType_t type)
+{
 	/* Check button */
 	if (type == TM_BUTTON_PressType_OnPressed) {
 		//data_lvl1[led_value] = 4095;
+
+		//delte me, just leave normal
+		//led_button_choosen = 1;
 	} else if (type == TM_BUTTON_PressType_Normal) {
 		//data_lvl1[led_value + 16] = 4095;
-		led_button_choosen = led_value_16;
+		led_button_choosen = 1;
 		//led_button_choosen = led_value_lvl;
 	} else {
 		//data_lvl1[led_value + 16] = 0;
-
 	}
 }
-void DisplayCrusor(int on)
+
+/*
+ * @brif: Draw/erase Crusor
+ * @param: ON_CRUSOR, OFF_CRUSOR
+ * @param: color in 16
+ * */
+void DisplayCrusor(int on, int color)
 {
 	int led_on_off;
+	//TODO: change on off and give defines;  change parameters
 	if(on == 1){
-		led_on_off = 4095;
+		led_on_off = 1;
 	} else {
 		led_on_off = 0;
 	}
+	//give color or erase it
+	Pin_on_crusor(led_value_adc_x, led_value_adc_y, led_value_adc_z, led_on_off);
+}
 
-	switch(led_value_lvl){
-
-	case 0:
-		data_lvl1[led_value_16] = led_on_off;
-	break;
-
-	case 1:
-		data_lvl2[led_value_16] = led_on_off;
-	break;
-
-	case 2:
-		data_lvl3[led_value_16] = led_on_off;
-	break;
-
-	case 3:
-		data_lvl4[led_value_16] = led_on_off;
-	break;
-
-
+int Read_ADC_difference(int *old, int *new)
+{
+	if(*new - *old > 120 ||  *old - *new > 120){
+		return *new;
 	}
+	else return *old;
+}
+
+void Cursor_read_ADC_values()
+{
+	static int x_adc_read;
+	static int y_adc_read;
+	static int z_adc_read;
+	int dummy;
+	int x_read_new;
+	int y_read_new;
+	int z_read_new;
+	//goes in ones just ot fill old values with 0
+	if(flag_cursor_read_ADC_values == 0){
+		x_adc_read = 0;
+		y_adc_read = 0;
+		z_adc_read = 0;
+		flag_cursor_read_ADC_values = 1;
+	}
+	dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+	x_read_new = TM_ADC_Read(ADC1, ADC_Channel_0);
+	dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+	y_read_new = TM_ADC_Read(ADC1, ADC_Channel_1);
+	dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+	z_read_new = TM_ADC_Read(ADC1, ADC_Channel_2);
+
+	x_adc_read = Read_ADC_difference(&x_adc_read, &x_read_new);
+	y_adc_read = Read_ADC_difference(&y_adc_read, &y_read_new);
+	z_adc_read = Read_ADC_difference(&z_adc_read, &z_read_new);
+
+	led_value_adc_x = x_adc_read / 1050;
+	led_value_adc_y = y_adc_read / 1050;
+	led_value_adc_z = z_adc_read / 1050;
 
 
 }
 
-void read_ADC_led(){
+void read_ADC_led()
+{
+	int color = 0x0000FF; //Blue standart color
 
-	int adc_rvalue_16;
-	int adc_rvalue_lvl;
 	led_button_choosen = -1;
 
-	adc_rvalue_16 = TM_ADC_Read(ADC1, ADC_Channel_0);
-	adc_rvalue_lvl = TM_ADC_Read(ADC1, ADC_Channel_1);
-
-	led_value_16 = adc_rvalue_16/ 256;
-	led_value_lvl = adc_rvalue_lvl/1000;
+	Cursor_read_ADC_values();
 
 	//Led Curzor on
-	DisplayCrusor(1);
+	DisplayCrusor(1, color);
 	//data_lvl1[led_value] = 4095;
 
 	TM_BUTTON_Update();
 	Delayms(100);
 
 	//Led Curzor off
-	DisplayCrusor(0);
+	DisplayCrusor(0, color);
 }
 
 void DisplayWinner( int *board, const int ourIndex, const int us, const int DirIndex)
 {
-
 	//TODO:
 	int win_array[4];
 	int n_p = 0;
 	int n_m = 1;
 	int i;
+	int startSq;
 
 	//Fill winning array with 4 board positions
 	while(board[ourIndex + (n_p * Directions[DirIndex])] != BORDER){
-		win_array[n_p] = ourIndex + (n_p * Directions[DirIndex]);
+		startSq = ourIndex + (n_p * Directions[DirIndex]);
+		if(startSq > 144 || startSq < 0){ break;}
+		win_array[n_p] = startSq;
 		n_p++;
 	}
 
 	while(board[ourIndex - (n_m * Directions[DirIndex])] != BORDER){
-		win_array[n_m] = ourIndex - (n_m * Directions[DirIndex]);
+		startSq = ourIndex - (n_m * Directions[DirIndex]);
+		if(startSq > 144 || startSq < 0) break;
+		win_array[n_m + (n_p - 1)] = startSq;
 		n_m++;
 	}
 	for(i = 0; i < 5; i++){
@@ -205,14 +241,15 @@ void DisplayWinner( int *board, const int ourIndex, const int us, const int DirI
 		for(n_p = 0; n_p < 4;n_p++){
 			board[win_array[n_p]] = us;
 		}
+
 		EmptyPrintBoard();
 		PrintBoard(&board[0]);
 		Delayms(400);
 	}
-
 }
 
-int GetNumForDir(int startSq, const int dir, const int *board, const int us) {
+int GetNumForDir(int startSq, const int dir, const int *board, const int us)
+{
 	int found = 0;
 	if(startSq > 144 || startSq < 0) return found;
 	while(board[startSq] != BORDER) {
@@ -221,17 +258,19 @@ int GetNumForDir(int startSq, const int dir, const int *board, const int us) {
 		}
 		found++;
 		startSq += dir;
+		if(startSq > 144 || startSq < 0) return found;
 	}
 	return found;
 }
-//TODO:
-int FindFourInARow( int *board, const int ourindex, const int us) {
 
+//TODO:
+int FindFourInARow( int *board, const int ourindex, const int us)
+{
 	int DirIndex = 0;
 	int Dir = 0;
 	int FourCount = 1;
 
-	for(DirIndex = 0; DirIndex < 9; ++DirIndex) {
+	for(DirIndex = 0; DirIndex < 11; ++DirIndex) {
 		Dir = Directions[DirIndex];
 		FourCount += GetNumForDir(ourindex + Dir, Dir, board, us);
 		FourCount += GetNumForDir(ourindex + Dir * (-1), Dir * (-1), board, us);
@@ -243,8 +282,10 @@ int FindFourInARow( int *board, const int ourindex, const int us) {
 	}
 	return FourCount;
 }
+
 //OK
-void InitialiseBoard(int *board) {
+void InitialiseBoard(int *board)
+{
 	int index = 0;
 
 	for(index = 0; index < 36*4; ++index) {
@@ -256,7 +297,8 @@ void InitialiseBoard(int *board) {
 	}
 }
 
-int DetermineLayer(const int n ){
+int DetermineLayer(const int n )
+{
 	if(n < 16) return 1;
 	if(16 <= n && n < 32) return 2;
 	if(32 <= n && n < 48) return 3;
@@ -265,62 +307,49 @@ int DetermineLayer(const int n ){
 	return 0;
 }
 
-void PrintBoard(const int *board) {
-
+void PrintBoard(const int *board)
+{
 	int n;
 	int board_value;
-	int color = 0;
+	int color = -1;
 	for(n = 0; n < 16*4; n++){
 		board_value = board[ConvertTo36_4[n]];
 		if(board_value == NOUGHTS )
 			color = 16;
 			//data_lvl1[n + 16] = 4095;
 		if(board_value == CROSSES )
-			color = 32;
+			color = 0;
 		 	//data_lvl1[n + 32] = 4095;
 
-		if(color > 0){
+		if(color >= 0){
 			switch(DetermineLayer(n)){
 
 				case 1:
-					data_lvl1[n + color] = 4095;
-					color = 0;
+					data_lvl1[LedArrayOneLvl[n] + color] = 4095;
+					color = -1;
 				break;
 
 				case 2:
-					data_lvl2[(n-16) + color] = 4095;
-					color = 0;
+					data_lvl2[LedArrayOneLvl[n-16] + color] = 4095;
+					color = -1;
 				break;
 
 				case 3:
-					data_lvl3[(n-32) + color] = 4095;
-					color = 0;
+					data_lvl3[LedArrayOneLvl[n-32] + color] = 4095;
+					color = -1;
 				break;
 
 				case 4:
-					data_lvl4[(n-48) + color] = 4095;
-					color = 0;
+					data_lvl4[LedArrayOneLvl[n-48] + color] = 4095;
+					color = -1;
 				break;
 			}
 		}
 	}
-
-	/*
-	int index = 0;
-	char pceChars[] = "OX|-";
-
-	printf("\n\nBoard:\n\n");
-	for(index = 0; index < 16; ++index) {
-		if(index != 0 && index%4 == 0) { //index%4 ??
-			printf("\n\n");
-		}
-		printf("%4c",pceChars[board[ConvertTo36[index]]]);
-	}
-	printf("\n");
-	*/
 }
 
-void EmptyPrintBoard(){
+void EmptyPrintBoard()
+{
 	int i;
 	for(i = 0; i < 46; i++){
 		data_lvl1[i] = 0;
@@ -329,8 +358,10 @@ void EmptyPrintBoard(){
 		data_lvl4[i] = 0;
 	}
 }
+
 //OK
-int HasEmpty(const int *board) {
+int HasEmpty(const int *board)
+{
 	int index = 0;
 
 	for(index = 0; index < 16*4; ++index) {
@@ -338,8 +369,10 @@ int HasEmpty(const int *board) {
 	}
 	return 0;
 }
+
 //OK
-void MakeMove(int *board, const int sq, const side) {
+void MakeMove(int *board, const int sq, int side)
+{
 	board[sq] = side;
 }
 
@@ -358,9 +391,13 @@ int GetComputerMove(const int *board) {
 	randMove = (TM_RNG_Get() % numFree);
 	return availableMoves[randMove];
 }
+
 /////////////////////////////////////////////////////////////////
-int GetHumanMove(const int *board) {
+int GetHumanMove(const int *board)
+{
+
 	int moveOk = 0;
+	//TODO:Poprav tale led_button_choosen!
 	led_button_choosen = -1;
 
 	while (moveOk == 0) {
@@ -391,7 +428,7 @@ int GetHumanMove(const int *board) {
 		*/
 		// move--; // Zero indexing
 
-		if( board[ConvertTo36_4[led_value_16 + led_value_lvl*16]]!= EMPTY) {
+		if( board[LedArray3D_TicTacToe[led_value_adc_z][led_value_adc_x][led_value_adc_y]]!= EMPTY) {
 			//printf("Square not available\n");
 			led_button_choosen = -1;
 			continue;
@@ -399,11 +436,13 @@ int GetHumanMove(const int *board) {
 		moveOk = 1;
 	}
 	//printf("Making Move...%d\n",(move+1));
-	return ConvertTo36_4[led_value_16 + led_value_lvl*16];
+	return LedArray3D_TicTacToe[led_value_adc_z][led_value_adc_x][led_value_adc_y];
 }
 
-void RunGame() {
-
+void RunGame(choosePlayer playerOne, choosePlayer playerTwo)
+{
+	flag_cursor_read_ADC_values = 0;
+ 	TM_RNG_Init();
 	int GameOver = 0;
 	int Side = NOUGHTS;
 	int LastMoveMade = 0;
@@ -414,20 +453,27 @@ void RunGame() {
 	InitialiseBoard(&board[0]);
 	PrintBoard(&board[0]);
 
+	//delete me
+	led_button_choosen = -1;
+
 	while(!GameOver) {
 		if(Side==NOUGHTS) {
-			LastMoveMade = GetHumanMove(&board[0]);
+			LastMoveMade = playerOne(&board[0]);
 			MakeMove(&board[0],LastMoveMade,Side);
 			Side=CROSSES;
 			PrintBoard(&board[0]);
+
+
+
 		} else {
-			LastMoveMade = GetHumanMove(&board[0]);
+			LastMoveMade = playerTwo(&board[0]);
 			MakeMove(&board[0],LastMoveMade,Side);
 			Side=NOUGHTS;
 			PrintBoard(&board[0]);
 		}
-		Delayms(200);
 
+
+		//Delayms(200);
 		// if three in a row exists Game is over
 		if( FindFourInARow(&board[0], LastMoveMade, Side ^ 1) == 4) {
 			//printf("Game over!\n");
@@ -443,19 +489,23 @@ void RunGame() {
 		if(!HasEmpty(board)) {
 			//printf("Game over!\n");
 			GameOver = 1;
+			Anim_matrix();
 			//printf("It's a draw\n");
 		}
 	}
 
 	PrintBoard(&board[0]);
+	DeleteAllLeds();
 	free(board);
 }
 
 
 void Rungame_here()
 {
- 	TM_RNG_Init();
-	RunGame();
+	//TODO:magar puprav to ->trenutno je flag za adc, ker neznam drugac narest
+
+	//RunGame();
+
 }
 
 

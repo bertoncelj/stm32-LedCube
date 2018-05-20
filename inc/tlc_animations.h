@@ -65,6 +65,7 @@ void Anim_Loytra(int x, int y, int z, int color);
 void Anim_matrix();
 
 /*Leds on/off*/
+void Pin_on_crusor(int x, int y, int z, int on_off);
 void Pin_on(int x, int y, int z, int color);
 void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl);
 void Update_me(int pin,int color_r,int color_g,int color_b, int lvl);

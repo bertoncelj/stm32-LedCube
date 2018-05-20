@@ -17,16 +17,17 @@
 enum { NOUGHTS, CROSSES, BORDER, EMPTY, LEDOFFN, LEDOFFC};
 enum { HUMANWIN, COMPWIN, DRAW };
 
-
+typedef int (*choosePlayer)(const int *board);
 /* ARRAY BOARD*/
 
-
+LedArrayOneLvl[16];
+int led_button_choosen;
 
 extern void TM_RNG_Init(void);
 extern uint32_t TM_RNG_Get(void);
 
 //Button function
-void BUTTON1_EventHandler(TM_BUTTON_PressType_t type);
+void BUTTON_OK_EventHandler(TM_BUTTON_PressType_t type);
 
 /*Functions*/
 
@@ -36,11 +37,12 @@ int FindFourInARow(int *board, const int ourindex, const int us);
 void InitialiseBoard(int *board) ;
 void PrintBoard(const int *board);
 int HasEmpty(const int *board);
-void MakeMove(int *board, const int sq, const side);
+void MakeMove(int *board, const int sq,  int side);
 int GetComputerMove(const int *board);
 int GetHumanMove(const int *board);
-void RunGame();
-void DisplayCrusor( int on);
+
+void RunGame(choosePlayer playerOne, choosePlayer playerTwo);
+void DisplayCrusor(int on, int color);
 void DisplayWinner( int *board, const int ourIndex, const int us, const int DirIndex);
 void EmptyPrintBoard();
 #endif /* TIC_TAC_TOE_H_ */

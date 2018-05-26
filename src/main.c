@@ -13,6 +13,7 @@
 #include "tlc5940.h"
 #include "tic_tac_toe.h"
 #include <stdio.h>
+#include "tm_stm32f4_rng.h"
 
 
 
@@ -54,13 +55,18 @@ int main(void){
  TM_DELAY_Init();
  // MCO2_INIT();
 
+
+ //RANDOM INIT
+ TM_RNG_Init();
+
  //LCD INIT
  TM_HD44780_Init(16, 2);
  TM_HD44780_Puts(0, 0, "Hell");
 
+ tim_gsclk_init();
 
  Tlc5940_setAllDC(63);	//max 63
- //GPIO_SetPinLow(TLC5940_GPIO,PIN_LEVEL_1);
+ //GPIO_SetPinHigh(TLC5940_GPIO,PIN_LEVEL_1);
  GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
 
     GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_1);
@@ -112,29 +118,34 @@ int main(void){
  TIM_Cmd(TIM3, ENABLE);
 
  while(1){
-	 menu();
+	// menu();
 	 //Rungame_here();
 
-	// BasicAnim_Colors();
-	// BasicAnim_One_startToEnd();
-	// Anim_Quatro_2Squars_Infinity();
-	// Anim_Quatro_4Squars_Infinity();
-	// Anime_Wall( count_up, STOLPEC);
-	// Anime_Wall( count_up, VRSTICA);
-	// Anime_Wall( count_down, STOLPEC);
-	// Anime_Wall( count_down, VRSTICA);
+	 //int color = get_random_color();
 
+
+	 BasicAnim_Colors();
 	 /*
-	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, ROSE);
-	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,1, ROSE);
-	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 1, ROSE);
-	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 1, ROSE);
+	 BasicAnim_One_startToEnd();
 
-	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,4, BLUE);
-	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, BLUE);
-	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, BLUE);
-	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, BLUE);
-	 */
+	 Anim_Quatro_2Squars_Infinity();
+	 Anim_Quatro_4Squars_Infinity();
+	Anime_Wall( count_up, STOLPEC);
+	 Anime_Wall( count_up, VRSTICA);
+	 Anime_Wall( count_down, STOLPEC);
+	 Anime_Wall( count_down, VRSTICA);
+	*/
+	 /*
+	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, get_random_color());
+	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,1, get_random_color());
+	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 1, get_random_color());
+	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 1, get_random_color());
+
+	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,4, get_random_color());
+	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, get_random_color());
+	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, get_random_color());
+	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, get_random_color());
+	*/
 
 
 	// BasicAnim_RGB_All();

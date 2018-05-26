@@ -8,20 +8,150 @@
 
 #include "tlc_animations.h"
 
-struct RGB
-{
-	unsigned char R;
-	unsigned char G;
-	unsigned char B;
-};
+typedef struct {
+    double r;       // a fraction between 0 and 1
+    double g;       // a fraction between 0 and 1
+    double b;       // a fraction between 0 and 1
+} rgb_doub;
 
-struct HSV
-{
-	double H;
-	double S;
-	double V;
-};
+typedef struct {
+    uint8_t r;       // a fraction between 0 and 1
+    uint8_t g;       // a fraction between 0 and 1
+    uint8_t b;       // a fraction between 0 and 1
+} rgb;
 
+typedef struct {
+    double h;       // angle in degrees
+    double s;       // a fraction between 0 and 1
+    double v;       // a fraction between 0 and 1
+} hsv;
+
+static hsv   rgb2hsv(rgb_doub in);
+//static rgb   hsv2rgb(hsv in);
+void hsv2rgb(hsv *in, rgb_doub*out);
+
+hsv rgb2hsv(rgb_doub in)
+{
+    hsv         out;
+    double      min, max, delta;
+
+    min = in.r < in.g ? in.r : in.g;
+    min = min  < in.b ? min  : in.b;
+
+    max = in.r > in.g ? in.r : in.g;
+    max = max  > in.b ? max  : in.b;
+
+    out.v = max;                                // v
+    delta = max - min;
+    if (delta < 0.00001)
+    {
+        out.s = 0;
+        out.h = 0; // undefined, maybe nan?
+        return out;
+    }
+    if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
+        out.s = (delta / max);                  // s
+    } else {
+        // if max is 0, then r = g = b = 0
+        // s = 0, h is undefined
+        out.s = 0.0;
+        out.h = NAN;                            // its now undefined
+        return out;
+    }
+    if( in.r >= max )                           // > is bogus, just keeps compilor happy
+        out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
+    else
+    if( in.g >= max )
+        out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
+    else
+        out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
+
+    out.h *= 60.0;                              // degrees
+
+    if( out.h < 0.0 )
+        out.h += 360.0;
+
+    return out;
+}
+
+
+void hsv2rgb(hsv *in, rgb_doub*out)
+{
+    double hh, p, q, t, ff;
+    long  i;
+
+
+    if(in->s <= 0.0) {       // < is bogus, just shuts up warnings
+        out->r = in->v;
+        out->g = in->v;
+        out->b = in->v;
+    }
+    hh = in->h;
+    if(hh >= 360.0) hh = 0.0;
+    hh /= 60.0;
+    i = (long)hh;
+    ff = hh - i;
+    p = in->v * (1.0 - in->s);
+    q = in->v * (1.0 - (in->s * ff));
+    t = in->v * (1.0 - (in->s * (1.0 - ff)));
+
+    switch(i) {
+    case 0:
+        out->r = in->v;
+        out->g = t;
+        out->b = p;
+        break;
+    case 1:
+        out->r = q;
+        out->g = in->v;
+        out->b = p;
+        break;
+    case 2:
+        out->r = p;
+        out->g = in->v;
+        out->b = t;
+        break;
+
+    case 3:
+        out->r = p;
+        out->g = q;
+        out->b = in->v;
+        break;
+    case 4:
+        out->r = t;
+        out->g = p;
+        out->b = in->v;
+        break;
+    case 5:
+    default:
+        out->r = in->v;
+        out->g = p;
+        out->b = q;
+        break;
+    }
+}
+
+int get_random_color()
+{
+	int H_deg = TM_RNG_Get()%360;
+	rgb_doub test_rgb;
+	hsv test_hsv;
+
+	test_hsv.h = H_deg;
+	test_hsv.s = 1;
+	test_hsv.v = 1;
+	hsv2rgb(&test_hsv, &test_rgb);
+	uint8_t r_num = test_rgb.r*255;
+	uint8_t g_num = test_rgb.g*255;
+	uint8_t b_num = test_rgb.b*255;
+
+	int color = 0;
+	color = r_num << 16;
+	color += g_num << 8;
+	color += b_num;
+
+	return color;
+}
 
 int count_up(int curr_idx, int count_to)
 {
@@ -74,84 +204,6 @@ const int LedArrayOneLvl2D[4][4] = {
  */
 
 
-struct RGB HSVToRGB(struct HSV *hsv) {
-	double r = 0, g = 0, b = 0;
-	double d;
-	if (hsv->S == 0)
-	{
-		r = hsv->V;
-		g = hsv->V;
-		b = hsv->V;
-	}
-	else
-	{
-		int i;
-		double f, p, q, t;
-
-		if (hsv->H == 360)
-			hsv->H = 0;
-		else
-			hsv->H = hsv->H / 60;
-		d = hsv->H;
-		d *= 10.;
-		int j = d;
-		d = (double) j / 10.;
-
-		i = (int)trunc(d);
-		f = hsv->H - i;
-
-		p = hsv->V * (1.0 - hsv->S);
-		q = hsv->V * (1.0 - (hsv->S * f));
-		t = hsv->V * (1.0 - (hsv->S * (1.0 - f)));
-
-		switch (i)
-		{
-		case 0:
-			r = hsv->V;
-			g = t;
-			b = p;
-			break;
-
-		case 1:
-			r = q;
-			g = hsv->V;
-			b = p;
-			break;
-
-		case 2:
-			r = p;
-			g = hsv->V;
-			b = t;
-			break;
-
-		case 3:
-			r = p;
-			g = q;
-			b = hsv->V;
-			break;
-
-		case 4:
-			r = t;
-			g = p;
-			b = hsv->V;
-			break;
-
-		default:
-			r = hsv->V;
-			g = p;
-			b = q;
-			break;
-		}
-
-	}
-
-	struct RGB rgb;
-	rgb.R = r * 255;
-	rgb.G = g * 255;
-	rgb.B = b * 255;
-
-	return rgb;
-}
 
 
 
@@ -418,10 +470,10 @@ void Anim_matrix(){
 	//int array_RGB[3];
 
 
-	struct HSV data = { 154, 0.43, 0.60 };
-	struct RGB value =HSVToRGB(&data);
+	//struct HSV data = { 154, 0.43, 0.60 };
+	//struct RGB value =HSVToRGB(&data);
 
-	Update_All_Layers(0, value.R, value.G, value.B);
+	//Update_All_Layers(0, value.R, value.G, value.B);
 
 
 	//TM_RNG_DeInit();

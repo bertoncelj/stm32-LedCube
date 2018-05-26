@@ -44,6 +44,19 @@
 #define PIN_LEVEL_2	    GPIO_Pin_5
 #define PIN_LEVEL_3 	GPIO_Pin_3
 #define PIN_LEVEL_4 	GPIO_Pin_1
+
+//DELETE ME
+#define SIG_GSCLK_PORT				GPIOA
+#define SIG_GSCLK_PORT_CLK    		RCC_AHB1Periph_GPIOA
+#define SIG_GSCLK_PIN				GPIO_Pin8
+#define SIG_GSCLK_PINSOURCE			GPIO_PinSource8
+#define SIG_GSCLK_PIN_AF			GPIO_AF_TIM1
+
+#define SIG_GSCLK_TIMER				TIM1
+#define SIG_GSCLK_TIMER_CLK			RCC_APB2Periph_TIM1
+
+
+//
 /**
  * Pin configuration
  *

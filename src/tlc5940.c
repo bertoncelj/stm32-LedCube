@@ -20,6 +20,12 @@ void TIM3_IRQHandler(void)
 	// GSCLK_Pulzes();
 }
 
+void TIM2_IRQHandler(void)
+{
+  int a = 1;
+  a++;
+}
+
 void GSCLK_Pulzes()
 {
 	//TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
@@ -27,11 +33,11 @@ void GSCLK_Pulzes()
 	TLC5940_GPIO->BSRRL = PIN_VPRG;
 	TLC5940_GPIO->BSRRH = PIN_VPRG;
 	for (i = 0; i < 4096; i++){
-		 		TLC5940_GPIO->BSRRL = PIN_GSCLK;
+		TLC5940_GPIO->BSRRL = PIN_GSCLK;
+		TLC5940_GPIO->BSRRH = PIN_GSCLK;
 
-		 		TLC5940_GPIO->BSRRH = PIN_GSCLK;
+	}
 
-		 				}
 		 Blank_Pulse();
 
 }
@@ -136,7 +142,7 @@ void TLC_Pin_Init(void)
       GPIO_InitStruct_SPI.GPIO_Mode = GPIO_Mode_OUT;
       GPIO_InitStruct_SPI.GPIO_OType = GPIO_OType_PP;
       GPIO_InitStruct_SPI.GPIO_Speed = GPIO_Speed_50MHz;
-      GPIO_InitStruct_SPI.GPIO_PuPd = GPIO_PuPd_NOPULL;
+      GPIO_InitStruct_SPI.GPIO_PuPd = GPIO_PuPd_UP;
       GPIO_Init(PORTx_PIN_LVL, &GPIO_InitStruct_SPI);
 
 	/* Set pins SCLK, MOSI->"SIN" -> GPIOA */
@@ -198,12 +204,15 @@ void PWM_Timer_Init_TLC(void)
 	TIM_OCInitTypeDef TIM_OC_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
+	  //YOUR PWM Pin here - PA1 in this case
+	GPIO_InitStruct_GSCLK.GPIO_Pin = GPIO_Pin_1;
 	GPIO_InitStruct_GSCLK.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStruct_GSCLK.GPIO_Pin  = DD_GSCLK;
-	GPIO_InitStruct_GSCLK.GPIO_Speed= GPIO_Speed_50MHz;
-
-	GPIO_Init(PORTx_GSCLK, &GPIO_InitStruct_GSCLK);
-
+	GPIO_InitStruct_GSCLK.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct_GSCLK.GPIO_PuPd = GPIO_PuPd_DOWN;
+	//GSCLK
+	GPIO_InitStruct_GSCLK.GPIO_Speed = GPIO_Speed_50MHz;
+	 //replace GPIOA with the GPIO of your OC Pin
+	 GPIO_Init(GPIOA, &GPIO_InitStruct_GSCLK);
 	/* Timer Init TIM2 */
 
 
@@ -213,19 +222,32 @@ void PWM_Timer_Init_TLC(void)
 	// Timer starten
 	TIM_Cmd(TIM2, ENABLE);
 
-	TIM_TimeBase_InitStructure.TIM_Prescaler = 2;
+
+	TIM_TimeBase_InitStructure.TIM_Prescaler = 71;
 	TIM_TimeBase_InitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBase_InitStructure.TIM_Period = 4095;
+	TIM_TimeBase_InitStructure.TIM_Period = 3;
 	TIM_TimeBase_InitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInit(TIM2, &TIM_TimeBase_InitStructure);	//50% duty cycle
+
+    TIM_OC_InitStructure.TIM_OCMode = TIM_OCMode_PWM2;
+    TIM_OC_InitStructure.TIM_OCIdleState = TIM_OCIdleState_Reset;
+    TIM_OC_InitStructure.TIM_OCNIdleState = TIM_OCNIdleState_Set;
+    TIM_OC_InitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+    TIM_OC_InitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;
+    TIM_OC_InitStructure.TIM_OutputState = TIM_OutputState_Enable;
+    TIM_OC_InitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
+    TIM_OC_InitStructure.TIM_Pulse = 2;	//50% duty cycle
+    //replace TIM2 with your desired timer and TIM_OCxInit to match your PWM port. In this case TIM2_CH2 is used (PA1)
+    TIM_OC1Init(TIM2, &TIM_OC_InitStructure);
+
 
 	//replace TIM2 with your desired timer and TIM_OCxInit to match your PWM port. In this case TIM2_CH2 is used (PA0)
 	//TIM_OC1Init(TIM2, &TIM_OC_InitStructure);
 
 	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+	   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+	   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
 	NVIC_Init(&NVIC_InitStructure);
 
 	NVIC_Init(&NVIC_InitStructure);
@@ -327,7 +349,7 @@ void Tlc5940_setAllDC(uint8_t value)
 void TLC_Update_lvl(uint16_t *data_lvl)
 {
 	uint8_t n;
-	uint8_t tim = 10;
+	uint8_t tim = 3;
 	//u16 data[COUNT_TLC* 16]={0x0000 ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000};
 
 	//TIM_Cmd(TIM3, DISABLE);
@@ -351,7 +373,7 @@ void TLC_Update_lvl(uint16_t *data_lvl)
 	 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
 	 _delay(tim);
 
-	 GSCLK_Pulzes();
+	  GSCLK_Pulzes();
 	// TIM_Cmd(TIM3, ENABLE);
 }
 
@@ -393,17 +415,21 @@ void TLC_here()
 			TLC_Update_lvl(&data_lvl1[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_4);
 
+
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
 			TLC_Update_lvl(&data_lvl2[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_3);
+
 
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
 			TLC_Update_lvl(&data_lvl3[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_2);
 
+
 			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
 			TLC_Update_lvl(&data_lvl4[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_1);
+
 
 }
 
@@ -442,13 +468,13 @@ SPI_InitTypeDef SPI_InitStruct;
 // enable clock for used IO pins
 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOD| TLC_RCC_AHB1, ENABLE);
 
-
+//Vsi pini init ZA GPIO D -> LEVEL PINS
 GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
 GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-GPIO_Init(GPIOD, &GPIO_InitStruct);
+GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+GPIO_Init(PORTx_PIN_LVL, &GPIO_InitStruct);
 
 GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
 GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
@@ -501,7 +527,7 @@ SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b; // one packet of data is 8 bits w
 SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low; // clock is low when idle
 SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge; // data sampled at first edge
 SPI_InitStruct.SPI_NSS = SPI_NSS_Soft | SPI_NSSInternalSoft_Set; // set the NSS management to internal and pull internal NSS high
-SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32; // SPI frequency is APB2 frequency / 4
+SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16; // SPI frequency is APB2 frequency / 4
 SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;// data is transmitted MSB first
 SPI_Init(SPI1, &SPI_InitStruct);
 
@@ -534,6 +560,7 @@ void Blank_Pulse(){
 
 	GPIO_SetPinHigh(TLC5940_GPIO, PIN_BLANK);
 	GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
+	GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
 //TLC5940_GPIO->ODR |=BLANK_PIN;
 //TLC5940_GPIO->ODR &=0x00000000;
 }
@@ -574,4 +601,58 @@ GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 GPIO_Init(GPIOC, &GPIO_InitStructure);
 GPIO_PinAFConfig(GPIOC, GPIO_PinSource9, GPIO_AF_MCO);
 
+}
+
+
+void tim_gsclk_init(void) {
+
+	// TIM1 clock enable
+	RCC_APB2PeriphClockCmd(SIG_GSCLK_TIMER_CLK, ENABLE);
+
+	// GPIO clock enable
+	RCC_AHB1PeriphClockCmd(SIG_GSCLK_PORT_CLK, ENABLE);
+
+	// GPIO configuration
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+	GPIO_Init(SIG_GSCLK_PORT, &GPIO_InitStructure);
+
+	// Connect PIN8 of PORT A to alternate function (TIM1)
+	GPIO_PinAFConfig(SIG_GSCLK_PORT, SIG_GSCLK_PINSOURCE, SIG_GSCLK_PIN_AF);
+
+
+	// Configure the timer
+	// Generate GSCLK signals
+
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+	TIM_OCInitTypeDef  TIM_OCInitStructure;
+
+	// Time base configuration
+	TIM_TimeBaseStructure.TIM_Prescaler = 0x0020;
+	TIM_TimeBaseStructure.TIM_Period = 0x0003;
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV2;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseInit(SIG_GSCLK_TIMER, &TIM_TimeBaseStructure);
+
+	// PWM1 Mode configuration: Channel1
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCInitStructure.TIM_Pulse = 0x0002;
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+	TIM_OC1Init(SIG_GSCLK_TIMER, &TIM_OCInitStructure);
+
+	// Be a slave of SIG_BLANK_TIMER
+	TIM_SelectInputTrigger(SIG_GSCLK_TIMER, TIM_TS_ITR2);
+	TIM_SelectSlaveMode(SIG_GSCLK_TIMER, TIM_SlaveMode_Gated);
+	TIM_SelectMasterSlaveMode(SIG_GSCLK_TIMER, TIM_MasterSlaveMode_Enable);
+
+	// enable the counter
+	TIM_Cmd(SIG_GSCLK_TIMER, ENABLE);
+
+	// Main Output Enable
+	TIM_CtrlPWMOutputs(SIG_GSCLK_TIMER, ENABLE);
 }

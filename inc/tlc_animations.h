@@ -63,14 +63,17 @@ void Anim_Quatro_4Squars_Infinity();
 void Anime_Wall( count_dir count_func, Direction dir);
 void Anim_Loytra(int x, int y, int z, int color);
 void Anim_matrix();
+void Anim_snake_rainbow(int lvl);
 
 /*Leds on/off*/
 void Pin_on_crusor(int x, int y, int z, int on_off);
 void Pin_on(int x, int y, int z, int color);
+int Pin_on_one(int pin,int lvl, int color);
 void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl);
 void Update_me(int pin,int color_r,int color_g,int color_b, int lvl);
 void Update_array_leds(int *arr, int length, int layer, int color, int shift);
 void Update_All_Layers(int pin, int color_r, int color_g, int color_b);
+int HSV_color_shift(int color_HSV_H);
 
 void DeleteAllLeds();
 

@@ -41,7 +41,7 @@
 
 #define PORTx_PIN_LVL 	GPIOD
 #define PIN_LEVEL_1  	GPIO_Pin_7
-#define PIN_LEVEL_2	    GPIO_Pin_5
+#define PIN_LEVEL_2	    GPIO_Pin_0
 #define PIN_LEVEL_3 	GPIO_Pin_3
 #define PIN_LEVEL_4 	GPIO_Pin_1
 

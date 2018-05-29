@@ -7,6 +7,7 @@
 
 
 #include "tlc_animations.h"
+//#include "tic_tac_toe.h"
 
 typedef struct {
     double r;       // a fraction between 0 and 1
@@ -129,6 +130,27 @@ void hsv2rgb(hsv *in, rgb_doub*out)
         out->b = q;
         break;
     }
+}
+
+int HSV_color_shift(int color_HSV_H)
+{
+	rgb_doub test_rgb;
+	hsv test_hsv;
+
+	test_hsv.h = color_HSV_H;
+	test_hsv.s = 1;
+	test_hsv.v = 1;
+	hsv2rgb(&test_hsv, &test_rgb);
+	uint8_t r_num = test_rgb.r*255;
+	uint8_t g_num = test_rgb.g*255;
+	uint8_t b_num = test_rgb.b*255;
+
+	int color = 0;
+	color = r_num << 16;
+	color += g_num << 8;
+	color += b_num;
+
+	return color;
 }
 
 int get_random_color()
@@ -460,25 +482,163 @@ void Anim_TrikotDriveBy(Direction dir, int a, int lvl_sp, int color)
 	Update_enaVrstica(a + (3*shf),	 dir, 0, lvl_sp);
 	Delayms(delay_time);
 }
+/*lvl 1-4
+ * start_color 0 - 360
+ * */
+void rainbow_one_lvl(int lvl, int start_color)
+{
+	int x,y,i;
+	int color_r = start_color;
+	for(i = 0; i < 1000; i++){
+		for(y = 0; y < 4; y++){
+			for(x = 0; x < 4; x++){
+				 Pin_on(x, y, lvl, HSV_color_shift(color_r));
+				 color_r +=1;
+				 if(color_r > 360) color_r = 0;
+			}
+		}
+		color_r -=15;
+	}
 
-
-void Anim_matrix(){
-
-	//TM_RNG_Init();
-	//int randMove;
-	//int i;
-	//int array_RGB[3];
-
-
-	//struct HSV data = { 154, 0.43, 0.60 };
-	//struct RGB value =HSVToRGB(&data);
-
-	//Update_All_Layers(0, value.R, value.G, value.B);
-
-
-	//TM_RNG_DeInit();
 }
 
+void rainbow_all_cube_same()
+{
+	int x,y,i;
+	int color_r = 0;
+	for(i = 0; i < 1000; i++){ 	//tle zmansi na 360 za en krog
+		for(y = 0; y < 4; y++){
+			for(x = 0; x < 4; x++){
+				 Pin_on(x, y, 0, HSV_color_shift(color_r));
+				 Pin_on(x, y, 1, HSV_color_shift(color_r));
+				 Pin_on(x, y, 2, HSV_color_shift(color_r));
+				 Pin_on(x, y, 3, HSV_color_shift(color_r));
+				 color_r +=1;
+				 if(color_r > 360) color_r = 0;
+				 Delayms(4);
+			}
+		}
+		color_r -=15;
+	}
+}
+
+void rainbow_all_cube_diff()
+{
+	int x,y,z,i;
+	int color_r = 0;
+	for(i = 0; i < 1000; i++){	//tle zmansi na 360 za en krog
+		for(y = 0; y < 4; y++){
+			for(x = 0; x < 4; x++){
+				for(z = 0; z < 4; z++){
+					 Pin_on(x, y, z, HSV_color_shift(color_r));
+					 Pin_on(x, y, z, HSV_color_shift(color_r));
+					 Pin_on(x, y, z, HSV_color_shift(color_r));
+					 Pin_on(x, y, z, HSV_color_shift(color_r));
+					 color_r +=1;
+					 if(color_r > 360) color_r = 0;
+					 Delayms(1);
+				}
+			}
+		}
+		color_r -=16*4 - 1;
+	}
+}
+
+void Anim_snake_rainbow(int lvl){
+
+	int i;
+	int r_color = TM_RNG_Get()%360;
+	for(i = 0; i < 32; i++){
+		Pin_on_one(i,lvl,HSV_color_shift(r_color));
+		r_color += 5;
+		Delayms(100);
+		if(i >= 16){
+			Pin_on_one(i-16, lvl, 0);
+		}
+		if(r_color > 360) r_color == 0;
+	}
+}
+
+void Update_cube_pin(int pin, int color)
+{
+	int color_r = color >> 16;
+	int color_g = color >> 8 & 0xFF;
+	int color_b = color & 0xFF;
+
+	color_r = (color_r*4095)/255;
+	color_g = (color_g*4095)/255;
+	color_b = (color_b*4095)/255;
+
+	switch(DetermineLayer(pin)){
+
+		case 1:
+			data_lvl1[LedArrayOneLvl[pin] + 0] =  color_r;
+			data_lvl1[LedArrayOneLvl[pin] + 16] = color_g;
+			data_lvl1[LedArrayOneLvl[pin] + 32] = color_b;
+			break;
+
+		case 2:
+			data_lvl2[LedArrayOneLvl[pin-16] + 0] =  color_r;
+			data_lvl2[LedArrayOneLvl[pin-16] + 16] = color_g;
+			data_lvl2[LedArrayOneLvl[pin-16] + 32] = color_b;
+		break;
+
+		case 3:
+			data_lvl3[LedArrayOneLvl[pin-32] + 0] =  color_r;
+			data_lvl3[LedArrayOneLvl[pin-32] + 16] = color_g;
+			data_lvl3[LedArrayOneLvl[pin-32] + 32] = color_b;
+		break;
+
+		case 4:
+			data_lvl4[LedArrayOneLvl[pin-48] + 0] =  color_r;
+			data_lvl4[LedArrayOneLvl[pin-48] + 16] = color_g;
+			data_lvl4[LedArrayOneLvl[pin-48] + 32] = color_b;
+		break;
+	}
+}
+
+/*
+ *	0, 1, 2, 3,
+ * 	4, 5, 6, 7
+ * 	8, 9,10,11
+ * 	12,13,14,15
+ *
+ * 	16,17,18,19
+ * 	20,21,22,23
+ * 	24,25,26,27
+ * 	28,29,30,31
+ *
+ * 	32,33,34,35
+ * 	36,37,38,39
+ * 	40,41,42,43
+ * 	44,45,46,47
+ *
+ * 	48,49,50,51
+ * 	52,53,54,55
+ * 	56,57,58,59
+ * 	60,61,62,63
+ */
+
+void Anim_infinity_snail_rnd()
+{
+	uint16_t r_color = TM_RNG_Get() % 360;
+	if(r_color > 360) r_color = r_color % 360;
+	int str = r_color % 2;
+	int arr[2][16] ={
+		{0,16,32,48,52,56,60,44,28,12,8,4,20,36,40,24},
+		{0,1,2,3,7,11,15,14,13,12,8,4,5,6,10,9}
+	};
+	int i;
+	for(i = 0; i < 16; i++){
+		Update_cube_pin(arr[str][i], HSV_color_shift(r_color));
+		Delayms(20);
+	}
+	for(i = 0; i < 16; i++){
+			Update_cube_pin(arr[str][i], 0);
+			Delayms(20);
+		}
+
+}
 void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl)
 {
 	int i=0;
@@ -583,6 +743,44 @@ void Anim_Loytra(int x, int y, int z, int color)
 		}
 	}
 
+}
+//lvl 1 - 4
+int Pin_on_one(int pin, int lvl,  int color)
+{
+	if(pin < 0 || pin > 15) return 0;
+	int color_r = color >> 16;
+	int color_g = color >> 8 & 0xFF;
+	int color_b = color & 0xFF;
+
+	color_r = (color_r*4095)/255;
+	color_g = (color_g*4095)/255;
+	color_b = (color_b*4095)/255;
+
+	switch(lvl){
+			case 1:
+				data_lvl1[pin + 0] = color_r;
+				data_lvl1[pin + 16] = color_g;
+				data_lvl1[pin + 32] = color_b;
+			break;
+
+			case 2:
+				data_lvl2[pin + 0] = color_r;
+				data_lvl2[pin + 16] = color_g;
+				data_lvl2[pin + 32] = color_b;
+			break;
+
+			case 3:
+				data_lvl3[pin + 0] = color_r;
+				data_lvl3[pin + 16] = color_g;
+				data_lvl3[pin + 32] = color_b;
+			break;
+
+			case 4:
+				data_lvl4[pin + 0] = color_r;
+				data_lvl4[pin + 16] = color_g;
+				data_lvl4[pin + 32] = color_b;
+			break;
+	}
 }
 
 void Update_me(int pin,int color_r,int color_g,int color_b, int lvl)

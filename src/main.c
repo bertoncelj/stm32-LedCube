@@ -69,10 +69,10 @@ int main(void){
  //GPIO_SetPinHigh(TLC5940_GPIO,PIN_LEVEL_1);
  GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
 
-    GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_1);
- 	GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_2);
- 	GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_3);
- 	GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_4);
+    GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
+ 	GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
+ 	GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
+ 	GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
 
  //Test
  /*GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
@@ -123,11 +123,11 @@ int main(void){
 
 	 //int color = get_random_color();
 
+	 Anim_infinity_snail_rnd();
+	 //BasicAnim_Colors();
 
-	 BasicAnim_Colors();
-	 /*
-	 BasicAnim_One_startToEnd();
-
+	 //BasicAnim_One_startToEnd();
+/*
 	 Anim_Quatro_2Squars_Infinity();
 	 Anim_Quatro_4Squars_Infinity();
 	Anime_Wall( count_up, STOLPEC);
@@ -145,11 +145,11 @@ int main(void){
 	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, get_random_color());
 	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, get_random_color());
 	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, get_random_color());
+
 	*/
 
-
-	// BasicAnim_RGB_All();
 	 //BasicAnim_RGB_All();
+	// BasicAnim_RGB_All();
 
 //NOTE: Porpravi timer 3 prescaler and period!
 

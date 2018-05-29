@@ -411,24 +411,24 @@ void TLC_here()
 
 
 
-			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
-			TLC_Update_lvl(&data_lvl1[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_4);
+			TLC_Update_lvl(&data_lvl1[0]);
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
 
 
-			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
-			TLC_Update_lvl(&data_lvl2[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_3);
+			TLC_Update_lvl(&data_lvl2[0]);
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
 
 
-			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
-			TLC_Update_lvl(&data_lvl3[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_2);
+			TLC_Update_lvl(&data_lvl3[0]);
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
 
 
-			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
-			TLC_Update_lvl(&data_lvl4[0]);
 			GPIO_SetPinHigh(PORTx_PIN_LVL, PIN_LEVEL_1);
+			TLC_Update_lvl(&data_lvl4[0]);
+			GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
 
 
 }
@@ -473,7 +473,7 @@ GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
 GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 GPIO_Init(PORTx_PIN_LVL, &GPIO_InitStruct);
 
 GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;

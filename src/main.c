@@ -122,7 +122,7 @@ int main(void){
 	 //Rungame_here();
 
 	 //int color = get_random_color();
-
+	 //Anim_zastave();
 	 Anim_infinity_snail_rnd();
 	 //BasicAnim_Colors();
 

@@ -18,6 +18,7 @@
 #define GREEN 	0x00FF00
 #define BLUE 	0x0000FF
 
+#define WHITE 		0xFFFFFF
 #define ROZI 		0xFA2CFF
 #define SVETLOMODRA 0x00BFFF
 #define ORANGE 		0xFAA460

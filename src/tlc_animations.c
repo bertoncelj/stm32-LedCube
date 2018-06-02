@@ -156,6 +156,7 @@ int HSV_color_shift(int color_HSV_H)
 int get_random_color()
 {
 	int H_deg = TM_RNG_Get()%360;
+	if(H_deg > 360) H_deg = H_deg % 360;
 	rgb_doub test_rgb;
 	hsv test_hsv;
 
@@ -623,22 +624,82 @@ void Anim_infinity_snail_rnd()
 {
 	uint16_t r_color = TM_RNG_Get() % 360;
 	if(r_color > 360) r_color = r_color % 360;
+	int lane = (r_color/3) % 4;
 	int str = r_color % 2;
 	int arr[2][16] ={
 		{0,16,32,48,52,56,60,44,28,12,8,4,20,36,40,24},
 		{0,1,2,3,7,11,15,14,13,12,8,4,5,6,10,9}
 	};
 	int i;
+
 	for(i = 0; i < 16; i++){
-		Update_cube_pin(arr[str][i], HSV_color_shift(r_color));
+		if(str == 0)
+		Update_cube_pin(arr[str][i] + lane, HSV_color_shift(r_color));
+		else Update_cube_pin(arr[str][i]+ lane*16, HSV_color_shift(r_color));
+		Delayms(40);
+	}
+	//ERASE
+	/*
+	for(i = 0; i < 16; i++){
+		if(str == 0)
+		Update_cube_pin(arr[str][i] + lane, 0);
+		else Update_cube_pin(arr[str][i] + lane*16, 0);
 		Delayms(20);
 	}
-	for(i = 0; i < 16; i++){
-			Update_cube_pin(arr[str][i], 0);
-			Delayms(20);
-		}
+	*/
+}
+
+void Anim_zastave(){
+
+	/*
+	 *	0, 1, 2, 3,
+	 * 	4, 5, 6, 7
+	 * 	8, 9,10,11
+	 * 	12,13,14,15
+	 *
+	 * 	16,17,18,19
+	 * 	20,21,22,23
+	 * 	24,25,26,27
+	 * 	28,29,30,31
+	 *
+	 * 	32,33,34,35
+	 * 	36,37,38,39
+	 * 	40,41,42,43
+	 * 	44,45,46,47
+	 *
+	 * 	48,49,50,51
+	 * 	52,53,54,55
+	 * 	56,57,58,59
+	 * 	60,61,62,63
+	 */
+	//japan
+	int arr1[16] = {WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE};
+	int arr2[16] = {WHITE,WHITE,WHITE,WHITE,WHITE,RED,RED,WHITE,WHITE,RED,RED, WHITE,WHITE,WHITE,WHITE,WHITE};
+	int arr3[16] = {WHITE,WHITE,WHITE,WHITE,WHITE,RED,RED,WHITE,WHITE,RED,RED, WHITE,WHITE,WHITE,WHITE,WHITE};
+	int arr4[16] = {WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE};
+
+	Update_array_leds_colors(arr1, 16, 1);
+	Update_array_leds_colors(arr2, 16, 2);
+	Update_array_leds_colors(arr3, 16, 3);
+	Update_array_leds_colors(arr4, 16, 4);
+
+	Delayms(2000);
+	//Slovenia
+	//arr1[16] = {WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE};
+	//arr2[16] = {BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE};
+	//arr3[16] = {BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE};
+	//arr4[16] = {RED,RED,RED,RED,RED,RED,RED,RED,RED,RED,RED,RED,RED,RED,RED,RED};
+
+	Update_array_leds_colors(arr1, 16, 1);
+	Update_array_leds_colors(arr2, 16, 2);
+	Update_array_leds_colors(arr3, 16, 3);
+	Update_array_leds_colors(arr4, 16, 4);
+
+
+	//Poland
 
 }
+
 void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl)
 {
 	int i=0;
@@ -812,7 +873,6 @@ void Update_me(int pin,int color_r,int color_g,int color_b, int lvl)
 		};
 }
 
-
 void Update_array_leds(int *arr, int length, int layer, int color, int shift)
 {
 	int i;
@@ -849,6 +909,51 @@ void Update_array_leds(int *arr, int length, int layer, int color, int shift)
 			data_lvl4[LedArrayOneLvl[arr[i] + shift] + 0] = color_r;
 			data_lvl4[LedArrayOneLvl[arr[i] + shift] + 16] = color_g;
 			data_lvl4[LedArrayOneLvl[arr[i] + shift] + 32] = color_b;
+		break;
+		}
+	}
+
+}
+
+
+void Update_array_leds_colors(int *arr, int length, int layer)
+{
+	int i;
+
+	for(i = 0; i < length; i ++){
+		int color = arr[i];
+
+		int color_r = color >> 16;
+		int color_g = color >> 8 & 0xFF;
+		int color_b = color & 0xFF;
+
+		color_r = (color_r*4095)/255;
+		color_g = (color_g*4095)/255;
+		color_b = (color_b*4095)/255;
+
+		switch(layer){
+		case 1:
+			data_lvl1[LedArrayOneLvl[i] + 0 ]= color_r;
+			data_lvl1[LedArrayOneLvl[i] + 16]= color_g;
+			data_lvl1[LedArrayOneLvl[i] + 32]= color_b;
+		break;
+
+		case 2:
+			data_lvl2[LedArrayOneLvl[i] + 0 ]= color_r;
+			data_lvl2[LedArrayOneLvl[i] + 16]= color_g;
+			data_lvl2[LedArrayOneLvl[i] + 32]= color_b;
+		break;
+
+		case 3:
+			data_lvl3[LedArrayOneLvl[i] + 0 ]= color_r;
+			data_lvl3[LedArrayOneLvl[i] + 16]= color_g;
+			data_lvl3[LedArrayOneLvl[i] + 32]= color_b;
+		break;
+
+		case 4:
+			data_lvl4[LedArrayOneLvl[i] + 0	]  = color_r;
+			data_lvl4[LedArrayOneLvl[i] + 16] = color_g;
+			data_lvl4[LedArrayOneLvl[i] + 32] = color_b;
 		break;
 		}
 	}

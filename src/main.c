@@ -61,7 +61,7 @@ int main(void){
 
  //LCD INIT
  TM_HD44780_Init(16, 2);
- TM_HD44780_Puts(0, 0, "Hell");
+ TM_HD44780_Puts(0, 0, "Hello motherfucer");
 
  tim_gsclk_init();
 
@@ -123,9 +123,10 @@ int main(void){
 
 	 //int color = get_random_color();
 	 //Anim_zastave();
-	 Anim_infinity_snail_rnd();
-	 //BasicAnim_Colors();
-
+	 //Anim_infinity_snail_rnd();
+	 	 BasicAnim_Colors();
+	 Rungame_here();
+	 RunGame(GetComputerMove(10, 1, 1), GetHumanMove);
 	 //BasicAnim_One_startToEnd();
 /*
 	 Anim_Quatro_2Squars_Infinity();
@@ -148,7 +149,7 @@ int main(void){
 
 	*/
 
-	 //BasicAnim_RGB_All();
+	 BasicAnim_RGB_All();
 	// BasicAnim_RGB_All();
 
 //NOTE: Porpravi timer 3 prescaler and period!

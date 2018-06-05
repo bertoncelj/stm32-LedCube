@@ -14,6 +14,19 @@ int led_value_adc_y;
 int led_value_adc_z;
 
 
+
+/*Tic Tac Toe variables*/
+int player = CROSSES;
+int opponent = NOUGHTS;
+//make it static in function Combo...
+int oldScore = 0;
+
+int true = 1;
+int false = 0;
+
+Move findBestMove(int *board, int side,int max_depth);
+
+
 uint8_t flag_cursor_read_ADC_values;
 /*
 int board[25] = {
@@ -207,87 +220,16 @@ void read_ADC_led()
 	//Led Curzor off
 	DisplayCrusor(0, color);
 }
+//////////////////////////////////////////////////////////////////////
 
-void DisplayWinner( int *board, const int ourIndex, const int us, const int DirIndex)
-{
-	//TODO:
-	int win_array[4];
-	int n_p = 0;
-	int n_m = 1;
-	int i;
-	int startSq;
-
-	//Fill winning array with 4 board positions
-	while(board[ourIndex + (n_p * Directions[DirIndex])] != BORDER){
-		startSq = ourIndex + (n_p * Directions[DirIndex]);
-		if(startSq > 144 || startSq < 0){ break;}
-		win_array[n_p] = startSq;
-		n_p++;
-	}
-
-	while(board[ourIndex - (n_m * Directions[DirIndex])] != BORDER){
-		startSq = ourIndex - (n_m * Directions[DirIndex]);
-		if(startSq > 144 || startSq < 0) break;
-		win_array[n_m + (n_p - 1)] = startSq;
-		n_m++;
-	}
-	for(i = 0; i < 5; i++){
-		for(n_p = 0; n_p < 4;n_p++){
-			board[win_array[n_p]] = 4;
-		}
-		EmptyPrintBoard();
-		PrintBoard(&board[0]);
-		Delayms(400);
-		for(n_p = 0; n_p < 4;n_p++){
-			board[win_array[n_p]] = us;
-		}
-
-		EmptyPrintBoard();
-		PrintBoard(&board[0]);
-		Delayms(400);
-	}
-}
-
-int GetNumForDir(int startSq, const int dir, const int *board, const int us)
-{
-	int found = 0;
-	if(startSq > 144 || startSq < 0) return found;
-	while(board[startSq] != BORDER) {
-		if(board[startSq] != us) {
-			break;
-		}
-		found++;
-		startSq += dir;
-		if(startSq > 144 || startSq < 0) return found;
-	}
-	return found;
-}
-
-//TODO:
-int FindFourInARow( int *board, const int ourindex, const int us)
-{
-	int DirIndex = 0;
-	int Dir = 0;
-	int FourCount = 1;
-
-	for(DirIndex = 0; DirIndex < 11; ++DirIndex) {
-		Dir = Directions[DirIndex];
-		FourCount += GetNumForDir(ourindex + Dir, Dir, board, us);
-		FourCount += GetNumForDir(ourindex + Dir * (-1), Dir * (-1), board, us);
-		if(FourCount == 4) {
-			DisplayWinner(board, ourindex, us, DirIndex);
-			break;
-		}
-		FourCount = 1;
-	}
-	return FourCount;
-}
-
-//OK
+/**
+ * @brief  Fill the start board, make boarders and empty tiles
+ * @param  Empty array size 36*4
+ * @retval None
+ */
 void InitialiseBoard(int *board)
 {
-	int index = 0;
-
+	int index;
 	for(index = 0; index < 36*4; ++index) {
 		board[index] = BORDER;
 	}
@@ -295,8 +237,16 @@ void InitialiseBoard(int *board)
 	for(index = 0; index < 16*4; ++index) {
 		board[ConvertTo36_4[index]] = EMPTY;
 	}
+	int rand_num = TM_RNG_Get();
+	rand_num = rand_num & 0x3F;
+	board[ConvertTo36_4[rand_num]] = CROSSES;
 }
 
+/**
+ * @brief  RBGCube -> Find layer 1,..,4 from 1,...,64 input
+ * @param  num 1,...,64
+ * @retval return layer 1,...,4
+ */
 int DetermineLayer(const int n )
 {
 	if(n < 16) return 1;
@@ -307,6 +257,12 @@ int DetermineLayer(const int n )
 	return 0;
 }
 
+/**
+ * @brief  Console application -> Print board
+ * @param  Array to print
+ * @param  Length of array
+ * @retval None
+ */
 void PrintBoard(const int *board)
 {
 	int n;
@@ -348,6 +304,11 @@ void PrintBoard(const int *board)
 	}
 }
 
+/**
+ * @brief  Empty all board
+ * @param  None
+ * @retval None
+ */
 void EmptyPrintBoard()
 {
 	int i;
@@ -359,24 +320,390 @@ void EmptyPrintBoard()
 	}
 }
 
-//OK
+/**
+ * @brief  Find Empty tile, return 1, else 0
+ * @param  Board size 36*4, playing board
+ * @retval find empty tile 1, else 0
+ */
 int HasEmpty(const int *board)
 {
-	int index = 0;
-
+	int index ;
 	for(index = 0; index < 16*4; ++index) {
 		if( board[ConvertTo36_4[index]] == EMPTY) return 1;
 	}
 	return 0;
 }
 
-//OK
+/**
+ * @brief  Save move into board
+ * @param  playing board
+ * @param  position from ConvertTo36_4[0,...,63]
+ * @param  cross or nought
+ * @retval none
+ */
 void MakeMove(int *board, const int sq, int side)
 {
 	board[sq] = side;
 }
 
-int GetComputerMove(const int *board) {
+/**
+ * @brief  Find if positions has same neighbors as us; max. num 4 for all row equal
+ * @param  Evaluating his neighbor
+ * @param  dir adding factor (pos. or neg)
+ * @param  playing board
+ * @param  Evalute for crosses or noughts
+ * @retval found 0,...,3
+ */
+int GetNumForDir(int startSq, const int dir, const int *board, const int us)
+{
+	int found = 0;
+    if(startSq > 144 || startSq < 0) return found;
+	while(board[startSq] != BORDER) {
+		if(board[startSq] != us) {
+			break;
+		}
+		found++;
+		startSq += dir;
+		if(startSq > 144 || startSq < 0) return found;
+	}
+	return found;
+}
+
+/**
+ * @brief  CHECK FOR WIN: find if a player has a 4 in row
+ * @param  Playing board
+ * @param  Single position, check all its neighbors for a win
+ * @param  Check crosses or neughts, depends on what our given position tile value is
+ * @retval If winner retrn 4 else, retrn 1
+ */
+int FindFourInARow( int *board, const int ourindex, const int us)
+{
+	int DirIndex = 0;
+	int Dir = 0;
+	int FourCount = 1;
+
+	for(DirIndex = 0; DirIndex < 11; ++DirIndex) {
+		Dir = Directions[DirIndex];
+		FourCount += GetNumForDir(ourindex + Dir, Dir, board, us);
+		FourCount += GetNumForDir(ourindex + Dir * (-1), Dir * (-1), board, us);
+		if(FourCount == 4) {
+			DisplayWinner(board, ourindex, us, DirIndex);
+			break;
+		}
+		FourCount = 1;
+	}
+	return FourCount;
+}
+
+/**
+ * @brief  Display Winner
+ * @param  Playing board
+ * @param  Single position witch is confirm in the winning row
+ * @param  Check crosses or noughts, depends on what our given position tile value is
+ * @param  Direction to find all other 3 winning positions
+ * @retval None
+ */
+void DisplayWinner( int *board, const int ourIndex, const int us, const int DirIndex)
+{
+	//TODO:
+	int win_array[4];
+	int n_p = 0;
+	int n_m = 1;
+	int i;
+	int startSq;
+
+	//Fill winning array with 4 board positions
+	while(board[ourIndex + (n_p * Directions[DirIndex])] != BORDER){
+		startSq = ourIndex + (n_p * Directions[DirIndex]);
+		if(startSq > 144 || startSq < 0){ break;}
+		win_array[n_p] = startSq;
+		n_p++;
+	}
+
+	while(board[ourIndex - (n_m * Directions[DirIndex])] != BORDER){
+		startSq = ourIndex - (n_m * Directions[DirIndex]);
+		if(startSq > 144 || startSq < 0) break;
+		win_array[n_m + (n_p - 1)] = startSq;
+		n_m++;
+	}
+	for(i = 0; i < 5; i++){
+		for(n_p = 0; n_p < 4;n_p++){
+			board[win_array[n_p]] = 4;
+		}
+		EmptyPrintBoard();
+		PrintBoard(&board[0]);
+		Delayms(400);
+		for(n_p = 0; n_p < 4;n_p++){
+			board[win_array[n_p]] = us;
+		}
+
+		EmptyPrintBoard();
+		PrintBoard(&board[0]);
+		Delayms(400);
+	}
+}
+
+///////////////////////////MINMAX////////////////////////////////////////
+
+/**
+ * @brief  Adding extra points if position is on corners or vertex
+ * @param  Player move
+ * @retval score
+ */
+int isItCorner(int moveImake)
+{
+	int i;
+    int score = 0;
+	int vertex[8] =  {7,10,25,28,115,118,133,136};
+	int corner[16] = {7,10,25,28,115,118,133,136,43,46,61,63,79, 82, 97, 100};
+
+	for(i = 0; i < 8; i++) {
+		if(moveImake == vertex[i]) score += 8;
+	}
+
+	for(i = 0; i < 16; i++) {
+		if(corner[i] == moveImake) score +=4;
+	}
+
+	return score;
+}
+
+/**
+ * @brief  Adding extra points if in func. FindCleanInARoW are same neighbors in one row
+ * @param  Calculated score from neighbors
+ * @retval score
+ */
+int detecCombo(int newScore)
+{
+    int score = 0;
+    //TODO: add static oldscore here
+    if(newScore-oldScore >= 200)  score+=100;    //majbe mal veci
+    if(newScore-oldScore >= 300)  score+=10000;
+    oldScore = newScore+score;
+    return score;
+}
+
+/**
+ * @brief  Evaluate single move by looking at his neighbors and giving POINTS for diff. combination
+ * @param  Evaluating his neighbor
+ * @param  dir is positive or negative one
+ * @param  playing board
+ * @param  Evalute for crosses or noughts
+ * @retval points
+ */
+int GetNumForDirClean(int startSq, const int dir, const int *board,  int us)
+{
+	int points = 0;
+	if(startSq > 144 || startSq < 0) return points;             //catch him if out of playing board
+	while(board[startSq] != BORDER) {
+		if(board[startSq] == EMPTY)	points+=1;                  //find empty; point -> 1
+		if(board[startSq] != us && board[startSq] != EMPTY) {   //TODO: change to side^1
+			break;                                              //If hit a neighbor whitch if opposite of him, imidiaty return
+		}
+		if(board[startSq] == us) points += 100;                 //Neighbor same as us; points -> 100
+		startSq += dir;                                         //going to a neighbor
+		if(startSq > 144 || startSq < 0) return points;         //catch him if out of playing board
+	}
+	return points;
+}
+
+/**
+ * @brief  Evalute move, giving a points
+ * @param  Playing board
+ * @param  Move to evaluate
+ * @param  cross or nought
+ * @retval score
+ */
+ //TODO: board constant
+int FindCleanInARoW(int *board, int my_move, int side)
+{
+	int DirIndex = 0;
+	int Dir = 0;
+	int score = 0;
+	oldScore = 0;
+	//printf("FiaR!\n");
+	for(DirIndex = 0; DirIndex < 11; ++DirIndex) {
+		Dir = Directions[DirIndex];
+		score += GetNumForDirClean(my_move + Dir, Dir, board, side);
+		score += GetNumForDirClean(my_move + Dir * (-1), Dir * (-1), board, side);
+        score += detecCombo(score);
+
+	}
+    score += isItCorner(my_move);
+	return score;
+}
+
+/**
+ * @brief  Evalute move, giving a points IF US return POSITIVE value, ENEMY NEGATIVE value
+ * @param  Playing board
+ * @param  Move to evaluate
+ * @param  cross or nought
+ * @retval score
+ */
+ //TODO: board constant and maybe combine with FindCleanInARoW
+int eval_comp_move(int *board, int moveImake,  int side)
+{
+	int retrn_val;
+	retrn_val = FindCleanInARoW(board, moveImake,  side);
+	if(side == opponent) retrn_val *= (-1);
+
+	return retrn_val;
+}
+
+// This is the minimax function. It considers all
+// the possible ways the game can go and returns
+// the value of the board
+int minimax(int *board, int depth, int isMax, int moveImake, int save_score, int max_depth)
+{
+
+	int MoveList[16*4];
+	int MoveCount = 0;
+    int Move_n;
+	int index;
+
+	int side;
+	(isMax == false) ? (side=player):(side=opponent);
+	int score = eval_comp_move(board, moveImake, side);
+    save_score = score;
+	//if depth ==4 end it
+	if (depth == max_depth)
+		return score;
+
+	// If Maximizer has won the game return his/her
+	// evaluated score
+	if(score >= 10000)
+		return score;
+
+    if(score <= -10000)
+		return score;
+
+	// If Minimizer has won the game return his/her
+	// evaluated score
+	//TODO: ce je se prosto mesto left
+
+	// If this maximizer's move
+	if (isMax)
+	{
+		int best = -10000;
+
+		// Traverse all cells
+		// fill Move List -> find empty places
+		for(index = 0; index < 16*4; ++index) {
+			if( board[ConvertTo36_4[index]] == EMPTY) {
+				MoveList[MoveCount++] = ConvertTo36_4[index];
+			}
+		}
+
+		// loop all moves
+		for(index = 0; index < MoveCount; ++index) {
+			Move_n = MoveList[index];
+			// Make the move
+			board[Move_n] = player;
+
+			// Call minimax recursively and choose
+			// the maximum value
+			best = max( best, minimax(board, depth+1, !isMax, Move_n, save_score, max_depth) );
+            //printf("\t\t Max:%d=%d + %d \n", best+save_score, save_score,best);
+
+			// Undo the move
+			board[Move_n] = EMPTY;
+		}
+		best = save_score + best;
+		return best;
+	}
+
+	// If this minimizer's move
+	else
+	{
+		int best = 10000;
+
+			// Traverse all cells
+		// fill Move List -> find empty places
+		for(index = 0; index < 16*4; ++index) {
+			if( board[ConvertTo36_4[index]] == EMPTY) {
+				MoveList[MoveCount++] = ConvertTo36_4[index];
+			}
+		}
+
+		// loop all moves
+		for(index = 0; index < MoveCount; ++index) {
+			Move_n = MoveList[index];
+			// Make the move
+			board[Move_n] = opponent;
+
+			// Call minimax recursively and choose
+			// the maximum value
+			best = min( best, minimax(board, depth+1, !isMax, Move_n,save_score, max_depth));
+            //printf("\tMin:%d=%d + %d \n", best+save_score, save_score,best);
+
+			// Undo the move
+			board[Move_n] = EMPTY;
+		}
+		best = save_score + best;
+		return best;
+	}
+}
+
+// This will return the best possible move for the player
+Move findBestMove(int *board, int side, int max_depth)
+{
+	Move bestMove;
+	bestMove.Move_position = -1;
+	bestMove.bestVal = -1000000;
+
+	int Move_n;
+	int MoveList[16*4];
+	int MoveCount = 0;
+	int index;
+
+	// Traverse all cells, evalutae minimax function for
+	// all empty cells. And return the cell with optimal
+	// value.
+		for(index = 0; index < 16*4; ++index) {
+			if( board[ConvertTo36_4[index]] == EMPTY) {
+				MoveList[MoveCount++] = ConvertTo36_4[index];
+			}
+		}
+
+		for(index = 0; index < MoveCount; ++index) {
+			Move_n = MoveList[index];
+
+			// Make the move
+			board[Move_n] = side;
+
+			// compute evaluation function for this
+			// move.
+			int moveVal = minimax(board, 0, false, Move_n, 0, max_depth);
+			//falses is opponent
+
+			// Undo the move
+			board[Move_n] = EMPTY;
+
+			// If the value of the current move is
+			// more than the best value, then update
+			// best/
+			if (moveVal > bestMove.bestVal) {
+				bestMove.Move_position = Move_n;
+				bestMove.bestVal = moveVal;
+			}
+		}
+	return bestMove;
+}
+
+/**
+ * @brief  Computer calculate his move
+ * @param  Playing board
+ * @param  Check crosses or noughts, depends on what our given position tile value is
+ * @param  MinMax max. depth
+ * @retval Move
+ */
+int GetComputerMove(int *board, const int side,const int max_depth)
+{
+	TIM_Cmd(TIM3, DISABLE);
+	Move bestMove = findBestMove(board, side, max_depth);
+	TIM_Cmd(TIM3, ENABLE);
+	return bestMove.Move_position;
+	/* RANDOM
 	int index = 0;
 	int numFree = 0;
 	int availableMoves[16*4];
@@ -390,9 +717,14 @@ int GetComputerMove(const int *board) {
 
 	randMove = (TM_RNG_Get() % numFree);
 	return availableMoves[randMove];
+	*/
 }
 
-/////////////////////////////////////////////////////////////////
+/**
+ * @brief  Console application-> Human adds his move
+ * @param  Playing board
+ * @retval human move
+ */
 int GetHumanMove(const int *board)
 {
 
@@ -439,7 +771,7 @@ int GetHumanMove(const int *board)
 	return LedArray3D_TicTacToe[led_value_adc_z][led_value_adc_x][led_value_adc_y];
 }
 
-void RunGame(choosePlayer playerOne, choosePlayer playerTwo)
+void RunGame(choosePlayerLvl playerOne, choosePlayerLvl playerTwo)
 {
 	flag_cursor_read_ADC_values = 0;
  	TM_RNG_Init();
@@ -458,7 +790,7 @@ void RunGame(choosePlayer playerOne, choosePlayer playerTwo)
 
 	while(!GameOver) {
 		if(Side==NOUGHTS) {
-			LastMoveMade = playerOne(&board[0]);
+			LastMoveMade = playerOne(&board[0], side, 1);
 			MakeMove(&board[0],LastMoveMade,Side);
 			Side=CROSSES;
 			PrintBoard(&board[0]);
@@ -489,7 +821,7 @@ void RunGame(choosePlayer playerOne, choosePlayer playerTwo)
 		if(!HasEmpty(board)) {
 			//printf("Game over!\n");
 			GameOver = 1;
-			Anim_matrix();
+			//Anim_matrix();
 			//printf("It's a draw\n");
 		}
 	}
@@ -502,9 +834,64 @@ void RunGame(choosePlayer playerOne, choosePlayer playerTwo)
 
 void Rungame_here()
 {
-	//TODO:magar puprav to ->trenutno je flag za adc, ker neznam drugac narest
+	{
+		flag_cursor_read_ADC_values = 0;
+	 	TM_RNG_Init();
+		int GameOver = 0;
+		int Side = NOUGHTS;
+		int LastMoveMade = 0;
 
-	//RunGame();
+		int *board =  malloc(36*4* sizeof(int));
+		if(!board) return;
+
+		InitialiseBoard(&board[0]);
+		PrintBoard(&board[0]);
+
+		//delete me
+		led_button_choosen = -1;
+
+		while(!GameOver) {
+			if(Side==NOUGHTS) {
+				LastMoveMade = GetHumanMove(&board[0]);
+				MakeMove(&board[0],LastMoveMade,Side);
+				Side=CROSSES;
+				PrintBoard(&board[0]);
+
+
+
+			} else {
+				LastMoveMade = GetComputerMove(&board[0], Side,1);
+				MakeMove(&board[0],LastMoveMade,Side);
+				Side=NOUGHTS;
+				PrintBoard(&board[0]);
+			}
+
+
+			Delayms(100);
+			// if three in a row exists Game is over
+			if( FindFourInARow(&board[0], LastMoveMade, Side ^ 1) == 4) {
+				//printf("Game over!\n");
+				GameOver = 1;
+				if(Side==NOUGHTS) {
+					//printf("Computer Wins\n");
+				} else {
+					//printf("Human Wins\n");
+				}
+			}
+
+			// if no more moves, game is a draw
+			if(!HasEmpty(board)) {
+				//printf("Game over!\n");
+				GameOver = 1;
+				//Anim_matrix();
+				//printf("It's a draw\n");
+			}
+		}
+
+		PrintBoard(&board[0]);
+		DeleteAllLeds();
+		free(board);
+	}
 
 }
 

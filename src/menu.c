@@ -90,7 +90,8 @@ void chooseGameType(int slider_read_value)
 		break;
 
 		case 1:
-			RunGame(GetHumanMove, GetComputerMove);
+			//ChooseComputorLvlMode();
+			RunGame(GetHumanMove, GetComputerMove());
 
 		break;
 
@@ -99,5 +100,14 @@ void chooseGameType(int slider_read_value)
 
 		break;
 	}
+}
+
+int ChooseComputorLvlMode()
+{
+	int hardLvl;
+
+
+
+	return hardLvl;
 }
 

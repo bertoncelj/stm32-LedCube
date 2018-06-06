@@ -1,34 +1,68 @@
 /**
  *  Defines for your entire project at one place
- * 
- *	@author 	Tilen Majerle
- *	@email		tilen@majerle.eu
- *	@website	http://stm32f4-discovery.com
- *	@version 	v1.0
- *	@ide		Keil uVision 5
- *	@license	GNU GPL v3
- *	
- * |----------------------------------------------------------------------
- * | Copyright (C) Tilen Majerle, 2014
- * | 
- * | This program is free software: you can redistribute it and/or modify
- * | it under the terms of the GNU General Public License as published by
- * | the Free Software Foundation, either version 3 of the License, or
- * | any later version.
- * |  
- * | This program is distributed in the hope that it will be useful,
- * | but WITHOUT ANY WARRANTY; without even the implied warranty of
- * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * | GNU General Public License for more details.
- * | 
- * | You should have received a copy of the GNU General Public License
- * | along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * |----------------------------------------------------------------------
  */
 #ifndef TM_DEFINES_H
 #define TM_DEFINES_H
 
-/* Control pins */
+//
+/**
+ * * ---------------------------------------------------
+ * 						TLC5940
+ *   ---------------------------------------------------
+ * Pin configuration TLC5940
+ *
+ * 		OUT2		OUT1		tlc5940	     stm32f4Discovery
+ * 		OUT3	D-> VPRG		PIN_VPRG	 GPIO_Pin_9
+ * 		OUT4	D->	SIN			PIN_MOSI 	 GPIO_Pin_7
+ * 		OUT5	D->	SCLK		PIN_SCK  	 GPIO_Pin_5
+ * 		OUT6	D->	XLAT		PIN_XLAT     GPIO_Pin_6
+ * 		OUT7	D->	BLANK		PIN_BLANK	 GPIO_Pin_5
+ * 		OUT8		GND			GND
+ * 		OUT9		VCC			3V
+ * 		OUT10		IREF		4kOhm TO GND
+ * 		OUT11		DCPRG		3V
+ * 		OUT12	D->	GSCLK		PIN_GSCLK	 GPIO_Pin_3
+ * 		OUT13		SOUT
+ * 		OUT14		XERR
+ * 		OUT15		OUT16
+ */
+
+#define NUM_TLCS 3
+
+#define TLC_RCC_AHA1 RCC_AHB1Periph_GPIOA
+#define TLC_RCC_AHB1 RCC_AHB1Periph_GPIOB
+#define TLC_RCC_AHD1 RCC_AHB1Periph_GPIOD
+
+#define PORTx_TLC5940 	GPIOB
+#define PIN_BLANK		GPIO_Pin_5
+#define PIN_VPRG 		GPIO_Pin_9
+#define PIN_XLAT 		GPIO_Pin_6
+
+#define PORTx_GSCLK 	GPIOB
+#define PIN_GSCLK		GPIO_Pin_3
+
+#define PORTx_SPI 		GPIOA
+#define PIN_MOSI 	 	GPIO_Pin_7		//SIN -> MOSI
+#define PIN_SCK  	 	GPIO_Pin_5	    //Clock SCLK
+
+#define PORTx_PIN_LVL 	GPIOD
+#define PIN_LEVEL_1  	GPIO_Pin_7
+#define PIN_LEVEL_2	    GPIO_Pin_0
+#define PIN_LEVEL_3 	GPIO_Pin_3
+#define PIN_LEVEL_4 	GPIO_Pin_1
+
+//Timer refresh rate
+#define TIMER_PERIOD 27
+#define TIMER_PRESCALER 59999
+
+
+/*
+ *   ---------------------------------------------------
+ * 						HD44780
+ *   ---------------------------------------------------
+ */
+
+/* Control pins for HD44780 */
 /* RS - Register select pin */
 #define HD44780_RS_PORT			GPIOB
 #define HD44780_RS_PIN			GPIO_Pin_11

@@ -8,35 +8,33 @@
 #include "tic_tac_toe.h"
 #include "tlc_animations.h"
 #include "tm_stm32f4_button.h"
+#include "tm_stm32f4_hd44780.h"
 
 extern	int led_button_choosen;
 uint8_t flag_read_ADC;
+int depth_lvl_1;
+int depth_lvl_2;
 
+void chooseGameType(int slider_read_value);
 
 void menu()
 {
-	int dummy;
-
 	static int slider_read_value;
 	int	slider_read_new;
 
 	char *text_display[2] = {"Animations", "Game"};
-
 
 	//goes in ones just ot fill old values with 0
 	if(flag_read_ADC == 0){
 		slider_read_value = 0;
 		flag_read_ADC = 1;
 	}
-
 	led_button_choosen = 0;
 	TM_HD44780_Puts(0,0,"Menu");
 	TM_HD44780_Puts(0,1,"Animations");
 
 	while(led_button_choosen == 0){
-
-
-		dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+		TM_ADC_Read(ADC1, ADC_Channel_4);
 		slider_read_new = TM_ADC_Read(ADC1, ADC_Channel_0);
 
 		slider_read_new = Read_ADC_difference(&slider_read_value, &slider_read_new);
@@ -52,22 +50,18 @@ void menu()
 		}
 		TM_BUTTON_Update();
 	}
-
 	if(slider_read_value == 1) chooseGameType(slider_read_value);
-	else Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, ROSE);
-
+	else ANIM_LIST_constat();
 }
-
 
 void chooseGameType(int slider_read_value)
 {
 	led_button_choosen = 0;
 	int	slider_read_new;
-	int dummy;
-	char *text_display[3] = {"PvsP", "PvsC","CvsC"};
+	char *text_display[4] = {"PvsP", "PvsC ","CvsC","Empty"};
 
 	while(led_button_choosen == 0){
-		dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+		TM_ADC_Read(ADC1, ADC_Channel_4);	//dummy read
 		slider_read_new = TM_ADC_Read(ADC1, ADC_Channel_0);
 
 		slider_read_new = Read_ADC_difference(&slider_read_value, &slider_read_new);
@@ -84,30 +78,19 @@ void chooseGameType(int slider_read_value)
 	}
 	switch(slider_read_value){
 		case 0:
-
-			RunGame(GetHumanMove, GetHumanMove);
+			RunGame(GetHumanMove, GetHumanMove,1,1);
 
 		break;
 
 		case 1:
-			//ChooseComputorLvlMode();
-			RunGame(GetHumanMove, GetComputerMove());
+			RunGame(GetHumanMove, GetComputerMove,1,1);
 
 		break;
 
 		case 2:
-			RunGame(GetComputerMove, GetComputerMove);
-
+			RunGame(GetComputerMove, GetComputerMove,1,1);
 		break;
 	}
 }
 
-int ChooseComputorLvlMode()
-{
-	int hardLvl;
-
-
-
-	return hardLvl;
-}
 

@@ -4,10 +4,9 @@
  *  Created on: May 1, 2018
  *      Author: tine
  */
-
-
 #include "tlc_animations.h"
-//#include "tic_tac_toe.h"
+#include "tm_stm32f4_rng.h"
+#include "tm_stm32f4_adc.h"
 
 typedef struct {
     double r;       // a fraction between 0 and 1
@@ -27,53 +26,8 @@ typedef struct {
     double v;       // a fraction between 0 and 1
 } hsv;
 
-static hsv   rgb2hsv(rgb_doub in);
-//static rgb   hsv2rgb(hsv in);
 void hsv2rgb(hsv *in, rgb_doub*out);
-
-hsv rgb2hsv(rgb_doub in)
-{
-    hsv         out;
-    double      min, max, delta;
-
-    min = in.r < in.g ? in.r : in.g;
-    min = min  < in.b ? min  : in.b;
-
-    max = in.r > in.g ? in.r : in.g;
-    max = max  > in.b ? max  : in.b;
-
-    out.v = max;                                // v
-    delta = max - min;
-    if (delta < 0.00001)
-    {
-        out.s = 0;
-        out.h = 0; // undefined, maybe nan?
-        return out;
-    }
-    if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
-        out.s = (delta / max);                  // s
-    } else {
-        // if max is 0, then r = g = b = 0
-        // s = 0, h is undefined
-        out.s = 0.0;
-        out.h = NAN;                            // its now undefined
-        return out;
-    }
-    if( in.r >= max )                           // > is bogus, just keeps compilor happy
-        out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
-    else
-    if( in.g >= max )
-        out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
-    else
-        out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
-
-    out.h *= 60.0;                              // degrees
-
-    if( out.h < 0.0 )
-        out.h += 360.0;
-
-    return out;
-}
+int DetermineLayer(const int n);	//originl in tic_tac_toe.c
 
 
 void hsv2rgb(hsv *in, rgb_doub*out)
@@ -213,23 +167,6 @@ const int LedArrayOneLvl2D[4][4] = {
 	{12,13,14,15}
 };
 
-/*rumena
- * 	r_ 4030
- *  g_ 714
- *  b_ 4095
- *
- *
- *svetlo rozi
- 	r_ 3124
- *  g_
- *
- *  b_ 0
- */
-
-
-
-
-
 void Pin_on_figurOutColors(int x, int y, int z)
 {
 	int color_r = TM_ADC_Read(ADC1, ADC_Channel_0);
@@ -258,75 +195,6 @@ void Pin_on_figurOutColors(int x, int y, int z)
 	case 3:
 		data_lvl4[LedArrayOneLvl2D[x][y] + 0] = color_r;
 		data_lvl4[LedArrayOneLvl2D[x][y] + 16] = color_g;
-		data_lvl4[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-	};
-
-}
-
-/*
- * @brif: positions 0 -> 3, color -> 0xFF12AB
- *
- * */
-void Pin_on(int x, int y, int z, int color)
-{
-
-	int i,a;
-	int color_r = color >> 16;
-	int color_g = color >> 8 & 0xFF;
-	int color_b = color & 0xFF;
-
-	color_r = (color_r*4095)/255;
-	color_g = (color_g*4095)/255;
-	color_b = (color_b*4095)/255;
-
-	switch(z){
-	case 0:
-		data_lvl1[LedArrayOneLvl2D[x][y] + 0] = color_r;
-		data_lvl1[LedArrayOneLvl2D[x][y] + 16] = color_g;
-		data_lvl1[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-
-	case 1:
-		data_lvl2[LedArrayOneLvl2D[x][y] + 0] = color_r;
-		data_lvl2[LedArrayOneLvl2D[x][y] + 16] = color_g;
-		data_lvl2[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-
-	case 2:
-		data_lvl3[LedArrayOneLvl2D[x][y] + 0] = color_r;
-		data_lvl3[LedArrayOneLvl2D[x][y] + 16] = color_g;
-		data_lvl3[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-
-	case 3:
-		data_lvl4[LedArrayOneLvl2D[x][y] + 0] = color_r;
-		data_lvl4[LedArrayOneLvl2D[x][y] + 16] = color_g;
-		data_lvl4[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-	};
-}
-
-void Pin_on_crusor(int x, int y, int z, int on_off)
-{
-	int color_b;
-	if(on_off == 1)color_b = 4094;
-	if(on_off == 0)color_b = 0;
-
-	switch(z){
-	case 0:
-		data_lvl1[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-
-	case 1:
-		data_lvl2[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-
-	case 2:
-		data_lvl3[LedArrayOneLvl2D[x][y] + 32] = color_b;
-	break;
-
-	case 3:
 		data_lvl4[LedArrayOneLvl2D[x][y] + 32] = color_b;
 	break;
 	};
@@ -406,7 +274,6 @@ void Anim_Quatro_4Squars_Infinity(){
 	    	Delayms(delay_time);
 	    	DeleteAllLeds();
 		}
-
 }
 
 void Anim_TrikotDriveBy(Direction dir, int a, int lvl_sp, int color)
@@ -483,6 +350,7 @@ void Anim_TrikotDriveBy(Direction dir, int a, int lvl_sp, int color)
 	Update_enaVrstica(a + (3*shf),	 dir, 0, lvl_sp);
 	Delayms(delay_time);
 }
+
 /*lvl 1-4
  * start_color 0 - 360
  * */
@@ -500,7 +368,6 @@ void rainbow_one_lvl(int lvl, int start_color)
 		}
 		color_r -=15;
 	}
-
 }
 
 void rainbow_all_cube_same()
@@ -527,7 +394,7 @@ void rainbow_all_cube_diff()
 {
 	int x,y,z,i;
 	int color_r = 0;
-	for(i = 0; i < 1000; i++){	//tle zmansi na 360 za en krog
+	for(i = 0; i < 350; i++){	//tle zmansi na 360 za en krog
 		for(y = 0; y < 4; y++){
 			for(x = 0; x < 4; x++){
 				for(z = 0; z < 4; z++){
@@ -556,69 +423,9 @@ void Anim_snake_rainbow(int lvl){
 		if(i >= 16){
 			Pin_on_one(i-16, lvl, 0);
 		}
-		if(r_color > 360) r_color == 0;
+		if(r_color > 360) r_color = 0;
 	}
 }
-
-void Update_cube_pin(int pin, int color)
-{
-	int color_r = color >> 16;
-	int color_g = color >> 8 & 0xFF;
-	int color_b = color & 0xFF;
-
-	color_r = (color_r*4095)/255;
-	color_g = (color_g*4095)/255;
-	color_b = (color_b*4095)/255;
-
-	switch(DetermineLayer(pin)){
-
-		case 1:
-			data_lvl1[LedArrayOneLvl[pin] + 0] =  color_r;
-			data_lvl1[LedArrayOneLvl[pin] + 16] = color_g;
-			data_lvl1[LedArrayOneLvl[pin] + 32] = color_b;
-			break;
-
-		case 2:
-			data_lvl2[LedArrayOneLvl[pin-16] + 0] =  color_r;
-			data_lvl2[LedArrayOneLvl[pin-16] + 16] = color_g;
-			data_lvl2[LedArrayOneLvl[pin-16] + 32] = color_b;
-		break;
-
-		case 3:
-			data_lvl3[LedArrayOneLvl[pin-32] + 0] =  color_r;
-			data_lvl3[LedArrayOneLvl[pin-32] + 16] = color_g;
-			data_lvl3[LedArrayOneLvl[pin-32] + 32] = color_b;
-		break;
-
-		case 4:
-			data_lvl4[LedArrayOneLvl[pin-48] + 0] =  color_r;
-			data_lvl4[LedArrayOneLvl[pin-48] + 16] = color_g;
-			data_lvl4[LedArrayOneLvl[pin-48] + 32] = color_b;
-		break;
-	}
-}
-
-/*
- *	0, 1, 2, 3,
- * 	4, 5, 6, 7
- * 	8, 9,10,11
- * 	12,13,14,15
- *
- * 	16,17,18,19
- * 	20,21,22,23
- * 	24,25,26,27
- * 	28,29,30,31
- *
- * 	32,33,34,35
- * 	36,37,38,39
- * 	40,41,42,43
- * 	44,45,46,47
- *
- * 	48,49,50,51
- * 	52,53,54,55
- * 	56,57,58,59
- * 	60,61,62,63
- */
 
 void Anim_infinity_snail_rnd()
 {
@@ -638,40 +445,10 @@ void Anim_infinity_snail_rnd()
 		else Update_cube_pin(arr[str][i]+ lane*16, HSV_color_shift(r_color));
 		Delayms(40);
 	}
-	//ERASE
-	/*
-	for(i = 0; i < 16; i++){
-		if(str == 0)
-		Update_cube_pin(arr[str][i] + lane, 0);
-		else Update_cube_pin(arr[str][i] + lane*16, 0);
-		Delayms(20);
-	}
-	*/
 }
 
 void Anim_zastave(){
 
-	/*
-	 *	0, 1, 2, 3,
-	 * 	4, 5, 6, 7
-	 * 	8, 9,10,11
-	 * 	12,13,14,15
-	 *
-	 * 	16,17,18,19
-	 * 	20,21,22,23
-	 * 	24,25,26,27
-	 * 	28,29,30,31
-	 *
-	 * 	32,33,34,35
-	 * 	36,37,38,39
-	 * 	40,41,42,43
-	 * 	44,45,46,47
-	 *
-	 * 	48,49,50,51
-	 * 	52,53,54,55
-	 * 	56,57,58,59
-	 * 	60,61,62,63
-	 */
 	//japan
 	int arr1[16] = {WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE,WHITE};
 	int arr2[16] = {WHITE,WHITE,WHITE,WHITE,WHITE,RED,RED,WHITE,WHITE,RED,RED, WHITE,WHITE,WHITE,WHITE,WHITE};
@@ -694,40 +471,11 @@ void Anim_zastave(){
 	Update_array_leds_colors(arr2, 16, 2);
 	Update_array_leds_colors(arr3, 16, 3);
 	Update_array_leds_colors(arr4, 16, 4);
-
-
-	//Poland
-
-}
-
-void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl)
-{
-	int i=0;
-	int color_r = color >> 16;
-	int color_g = color >> 8 & 0xFF;
-	int color_b = color & 0xFF;
-
-	color_r = (color_r*4095)/255;
-	color_g = (color_g*4095)/255;
-	color_b = (color_b*4095)/255;
-
-
-	//DeleteAllLeds();
-	if(dir  == STOLPEC){
-		for(i = 0; i < 4; i++){
-			Update_me(LedArrayOneLvl2D[i][draw_st_vr], color_r, color_g, color_b, lvl);
-		}
-	} else {
-		for(i = 0; i < 4; i++){
-			Update_me(LedArrayOneLvl2D[draw_st_vr][i], color_r, color_g, color_b, lvl);
-		}
-	}
-
 }
 
 void Wall(int draw_st_vr, Direction dir, int color)
 {
-	int i=0;
+	int i;
 	int color_r = color >> 16;
 	int color_g = color >> 8 & 0xFF;
 	int color_b = color & 0xFF;
@@ -769,7 +517,6 @@ void count(int start, int end, int step) {
 	for(i=start; i<end; i+=step) {
 		// execute code here
 		//Wall(i, dir, ROZI);
-
 	}
 }
 
@@ -803,8 +550,9 @@ void Anim_Loytra(int x, int y, int z, int color)
 			data_lvl4[LedArrayOneLvl2D[a][i] + 32] = color_b;
 		}
 	}
-
 }
+/*---------------------LEDS ON/OFF-------------------*/
+
 //lvl 1 - 4
 int Pin_on_one(int pin, int lvl,  int color)
 {
@@ -842,6 +590,7 @@ int Pin_on_one(int pin, int lvl,  int color)
 				data_lvl4[pin + 32] = color_b;
 			break;
 	}
+	return 1;
 }
 
 void Update_me(int pin,int color_r,int color_g,int color_b, int lvl)
@@ -912,9 +661,69 @@ void Update_array_leds(int *arr, int length, int layer, int color, int shift)
 		break;
 		}
 	}
-
 }
 
+void Update_enaVrstica(int draw_st_vr, Direction dir, int color, int lvl)
+{
+	int i=0;
+	int color_r = color >> 16;
+	int color_g = color >> 8 & 0xFF;
+	int color_b = color & 0xFF;
+
+	color_r = (color_r*4095)/255;
+	color_g = (color_g*4095)/255;
+	color_b = (color_b*4095)/255;
+
+
+	//DeleteAllLeds();
+	if(dir  == STOLPEC){
+		for(i = 0; i < 4; i++){
+			Update_me(LedArrayOneLvl2D[i][draw_st_vr], color_r, color_g, color_b, lvl);
+		}
+	} else {
+		for(i = 0; i < 4; i++){
+			Update_me(LedArrayOneLvl2D[draw_st_vr][i], color_r, color_g, color_b, lvl);
+		}
+	}
+}
+
+void Update_cube_pin(int pin, int color)
+{
+	int color_r = color >> 16;
+	int color_g = color >> 8 & 0xFF;
+	int color_b = color & 0xFF;
+
+	color_r = (color_r*4095)/255;
+	color_g = (color_g*4095)/255;
+	color_b = (color_b*4095)/255;
+
+	switch(DetermineLayer(pin)){
+
+		case 1:
+			data_lvl1[LedArrayOneLvl[pin] + 0] =  color_r;
+			data_lvl1[LedArrayOneLvl[pin] + 16] = color_g;
+			data_lvl1[LedArrayOneLvl[pin] + 32] = color_b;
+			break;
+
+		case 2:
+			data_lvl2[LedArrayOneLvl[pin-16] + 0] =  color_r;
+			data_lvl2[LedArrayOneLvl[pin-16] + 16] = color_g;
+			data_lvl2[LedArrayOneLvl[pin-16] + 32] = color_b;
+		break;
+
+		case 3:
+			data_lvl3[LedArrayOneLvl[pin-32] + 0] =  color_r;
+			data_lvl3[LedArrayOneLvl[pin-32] + 16] = color_g;
+			data_lvl3[LedArrayOneLvl[pin-32] + 32] = color_b;
+		break;
+
+		case 4:
+			data_lvl4[LedArrayOneLvl[pin-48] + 0] =  color_r;
+			data_lvl4[LedArrayOneLvl[pin-48] + 16] = color_g;
+			data_lvl4[LedArrayOneLvl[pin-48] + 32] = color_b;
+		break;
+	}
+}
 
 void Update_array_leds_colors(int *arr, int length, int layer)
 {
@@ -957,10 +766,10 @@ void Update_array_leds_colors(int *arr, int length, int layer)
 		break;
 		}
 	}
-
 }
-void Update_All_Layers(int pin, int color_r, int color_g, int color_b){
 
+void Update_All_Layers(int pin, int color_r, int color_g, int color_b)
+{
 	data_lvl1[pin + 0] = color_r;
 	data_lvl1[pin + 16] = color_g;
 	data_lvl1[pin + 32] = color_b;
@@ -978,6 +787,70 @@ void Update_All_Layers(int pin, int color_r, int color_g, int color_b){
 	data_lvl4[pin + 32] = color_b;
 }
 
+void Pin_on_crusor(int x, int y, int z, int on_off)
+{
+	int color_b;
+	if(on_off == 1)color_b = 4094;
+	if(on_off == 0)color_b = 0;
+
+	switch(z){
+		case 0:
+			data_lvl1[LedArrayOneLvl2D[x][y] + 32] = color_b;
+		break;
+
+		case 1:
+			data_lvl2[LedArrayOneLvl2D[x][y] + 32] = color_b;
+		break;
+
+		case 2:
+			data_lvl3[LedArrayOneLvl2D[x][y] + 32] = color_b;
+		break;
+
+		case 3:
+			data_lvl4[LedArrayOneLvl2D[x][y] + 32] = color_b;
+		break;
+	};
+}
+
+void Pin_on(int x, int y, int z, int color)
+{
+	int color_r = color >> 16;
+	int color_g = color >> 8 & 0xFF;
+	int color_b = color & 0xFF;
+
+	color_r = (color_r*4095)/255;
+	color_g = (color_g*4095)/255;
+	color_b = (color_b*4095)/255;
+
+	switch(z){
+	case 0:
+		data_lvl1[LedArrayOneLvl2D[x][y] + 0] = color_r;
+		data_lvl1[LedArrayOneLvl2D[x][y] + 16] = color_g;
+		data_lvl1[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+
+	case 1:
+		data_lvl2[LedArrayOneLvl2D[x][y] + 0] = color_r;
+		data_lvl2[LedArrayOneLvl2D[x][y] + 16] = color_g;
+		data_lvl2[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+
+	case 2:
+		data_lvl3[LedArrayOneLvl2D[x][y] + 0] = color_r;
+		data_lvl3[LedArrayOneLvl2D[x][y] + 16] = color_g;
+		data_lvl3[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+
+	case 3:
+		data_lvl4[LedArrayOneLvl2D[x][y] + 0] = color_r;
+		data_lvl4[LedArrayOneLvl2D[x][y] + 16] = color_g;
+		data_lvl4[LedArrayOneLvl2D[x][y] + 32] = color_b;
+	break;
+	};
+}
+
+
+/*---------------------BASIC ANIMATIONS-------------------*/
 void BasicAnim_Colors()
 {
 
@@ -997,8 +870,8 @@ void BasicAnim_Colors()
 		data_lvl3[n] = 0;
 		data_lvl4[n] = 0;
 	}
-
 }
+
 void BasicAnim_RGB_All()
 {
 	int n;
@@ -1011,13 +884,11 @@ void BasicAnim_RGB_All()
 	}
 	Delayms(1000);
 	for(n = 0; n < 16; n++){
-			data_lvl1[n] = 0;
-			data_lvl2[n] = 0;
-			data_lvl3[n] = 0;
-			data_lvl4[n] = 0;
-
-		}
-
+		data_lvl1[n] = 0;
+		data_lvl2[n] = 0;
+		data_lvl3[n] = 0;
+		data_lvl4[n] = 0;
+	}
 
 	for(n = 16; n < 32; n++){
 		data_lvl1[n] = 4095;
@@ -1025,29 +896,29 @@ void BasicAnim_RGB_All()
 		data_lvl3[n] = 4095;
 		data_lvl4[n] = 4095;
 	}
-
 	Delayms(1000);
 	for(n = 16; n < 32; n++){
-			data_lvl1[n] = 0;
-			data_lvl2[n] = 0;
-			data_lvl3[n] = 0;
-			data_lvl4[n] = 0;
-		}
+		data_lvl1[n] = 0;
+		data_lvl2[n] = 0;
+		data_lvl3[n] = 0;
+		data_lvl4[n] = 0;
+	}
 
-		for(n = 32; n < 48; n++){
-			data_lvl1[n] = 4095;
-			data_lvl2[n] = 4095;
-			data_lvl3[n] = 4095;
-			data_lvl4[n] = 4095;
-		}
-		Delayms(1000);
-		for(n = 32; n < 48; n++){
+	for(n = 32; n < 48; n++){
+		data_lvl1[n] = 4095;
+		data_lvl2[n] = 4095;
+		data_lvl3[n] = 4095;
+		data_lvl4[n] = 4095;
+	}
+	Delayms(1000);
+	for(n = 32; n < 48; n++){
 			data_lvl1[n] = 0;
 			data_lvl2[n] = 0;
 			data_lvl3[n] = 0;
 			data_lvl4[n] = 0;
-		}
+	}
 }
+
 void BasicAnim_One_startToEnd()
 {
 	int n;
@@ -1068,3 +939,35 @@ void DeleteAllLeds()
 		data_lvl4[n] = 0;
 	}
 }
+
+void ANIM_LIST_constat()
+{
+	 rainbow_all_cube_diff();
+	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, get_random_color());
+	 Anim_Quatro_2Squars_Infinity();
+	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,1, get_random_color());
+	 Anim_Quatro_4Squars_Infinity();
+	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 1, get_random_color());
+	 Anime_Wall( count_up, STOLPEC);
+	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 1, get_random_color());
+	 Anime_Wall( count_up, VRSTICA);
+
+	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,4, get_random_color());
+	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, get_random_color());
+	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, get_random_color());
+	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, get_random_color());
+
+	 Anim_infinity_snail_rnd();
+	 Anime_Wall( count_down, STOLPEC);
+	 Anim_zastave();
+
+	 Anime_Wall( count_down, VRSTICA);
+	 rainbow_all_cube_same();
+
+	Anim_snake_rainbow(1);
+	Anim_snake_rainbow(2);
+	Anim_snake_rainbow(3);
+	Anim_snake_rainbow(4);
+
+}
+

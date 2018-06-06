@@ -28,11 +28,8 @@
 enum { NOUGHTS, CROSSES, BORDER, EMPTY, LEDOFFN, LEDOFFC};
 enum { HUMANWIN, COMPWIN, DRAW };
 
-typedef int (*choosePlayer)(const int *board);
-typedef int (*choosePlayerLvl)(const int *board, const int side, const int max_depth);
+typedef int (*choosePlayer)( int *board, const int side, const int max_dept);
 /* ARRAY BOARD*/
-
-
 
 typedef struct move
 {
@@ -40,45 +37,36 @@ typedef struct move
 	int bestVal;
 }Move;
 
-
-
-
-
-LedArrayOneLvl[16];
+int LedArrayOneLvl[16];
 int led_button_choosen;
 
 extern void TM_RNG_Init(void);
 extern uint32_t TM_RNG_Get(void);
 
 
-
 /*Functions*/
-
-/* Stm32 Cube*/
 
 //Button function
 void BUTTON_OK_EventHandler(TM_BUTTON_PressType_t type);
 void read_ADC_led();
+int  Read_ADC_difference(int *old, int *new);
 void EmptyPrintBoard(void);
-int HasEmpty(const int *board);
+int  HasEmpty(const int *board);
 void PrintBoard(const int *board);
 void DisplayCrusor(int on, int color);
 
-//int GetComputerMove(const int *board);
-//int GetHumanMove(const int *board);
-
 /*Tic tac toe*/
-int GetNumForDir(int startSq, const int dir, const int *board, const int us);
-int FindFourInARow(int *board, const int ourindex, const int us);
-void InitialiseBoard(int *board) ;
+int  GetNumForDir(int startSq, const int dir, const int *board, const int us);
+int  FindFourInARow(int *board, const int ourindex, const int us);
+void InitialiseBoard(int *board);
+int  DetermineLayer(const int n);
 void MakeMove(int *board, const int sq,  int side);
-int GetHumanMove(const int *board);
-int GetComputerMove(int *board, const int side, int max_depth);
+int  GetHumanMove   ( int *board, int Side, int depth);
+int  GetComputerMove( int *board, const int side, int max_depth);
 
-void RunGame(choosePlayer playerOne, choosePlayer playerTwo);
+void RunGame(choosePlayer playerOne, choosePlayer playerTwo, int depth_ply1, int depth_ply2);
 void DisplayCrusor(int on, int color);
 void DisplayWinner( int *board, const int ourIndex, const int us, const int DirIndex);
-
 
 /*MinMax*/
 int eval_comp_move(int *board, int moveImake, const int side);

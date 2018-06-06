@@ -6,7 +6,7 @@
  */
 
 #include "tic_tac_toe.h"
-#include "tlc_animations.h"
+//#include "tlc_animations.h"
 
 int led_value_16;
 int led_value_adc_x;
@@ -18,6 +18,7 @@ int led_value_adc_z;
 /*Tic Tac Toe variables*/
 int player = CROSSES;
 int opponent = NOUGHTS;
+
 //make it static in function Combo...
 int oldScore = 0;
 
@@ -26,15 +27,15 @@ int false = 0;
 
 Move findBestMove(int *board, int side,int max_depth);
 
-
 uint8_t flag_cursor_read_ADC_values;
 /*
 int board[25] = {
-	:,:,:,:,:,
-	:,O,-,X,:,
-	:,X,-,-,:,
-	:,-,-,-,:,
-	:,:,:,:,:,
+	:,:,:,:,:,;
+	:,O,-,X,-,:,
+	:,X,-,-,-,:,
+	:,-,0,-,X,:,
+	:,-,-,-,O,:,
+	:,:,:,:,:,:,
 
 	 0, 1, 2, 3, 4, 5
 	 6, 7, 8, 9,10,11
@@ -173,7 +174,7 @@ void Cursor_read_ADC_values()
 	static int x_adc_read;
 	static int y_adc_read;
 	static int z_adc_read;
-	int dummy;
+
 	int x_read_new;
 	int y_read_new;
 	int z_read_new;
@@ -184,11 +185,11 @@ void Cursor_read_ADC_values()
 		z_adc_read = 0;
 		flag_cursor_read_ADC_values = 1;
 	}
-	dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+	TM_ADC_Read(ADC1, ADC_Channel_4); //dummy ADC
 	x_read_new = TM_ADC_Read(ADC1, ADC_Channel_0);
-	dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+	TM_ADC_Read(ADC1, ADC_Channel_4); //dummy ADC
 	y_read_new = TM_ADC_Read(ADC1, ADC_Channel_1);
-	dummy = TM_ADC_Read(ADC1, ADC_Channel_4);
+	TM_ADC_Read(ADC1, ADC_Channel_4); //dummy ADC
 	z_read_new = TM_ADC_Read(ADC1, ADC_Channel_2);
 
 	x_adc_read = Read_ADC_difference(&x_adc_read, &x_read_new);
@@ -198,8 +199,6 @@ void Cursor_read_ADC_values()
 	led_value_adc_x = x_adc_read / 1050;
 	led_value_adc_y = y_adc_read / 1050;
 	led_value_adc_z = z_adc_read / 1050;
-
-
 }
 
 void read_ADC_led()
@@ -220,7 +219,6 @@ void read_ADC_led()
 	//Led Curzor off
 	DisplayCrusor(0, color);
 }
-//////////////////////////////////////////////////////////////////////
 
 /**
  * @brief  Fill the start board, make boarders and empty tiles
@@ -237,9 +235,6 @@ void InitialiseBoard(int *board)
 	for(index = 0; index < 16*4; ++index) {
 		board[ConvertTo36_4[index]] = EMPTY;
 	}
-	int rand_num = TM_RNG_Get();
-	rand_num = rand_num & 0x3F;
-	board[ConvertTo36_4[rand_num]] = CROSSES;
 }
 
 /**
@@ -725,7 +720,7 @@ int GetComputerMove(int *board, const int side,const int max_depth)
  * @param  Playing board
  * @retval human move
  */
-int GetHumanMove(const int *board)
+int GetHumanMove(int *board, int Side, int depth)
 {
 
 	int moveOk = 0;
@@ -771,7 +766,7 @@ int GetHumanMove(const int *board)
 	return LedArray3D_TicTacToe[led_value_adc_z][led_value_adc_x][led_value_adc_y];
 }
 
-void RunGame(choosePlayerLvl playerOne, choosePlayerLvl playerTwo)
+void RunGame(choosePlayer playerOne, choosePlayer playerTwo, int depth_ply1, int depth_ply2)
 {
 	flag_cursor_read_ADC_values = 0;
  	TM_RNG_Init();
@@ -785,44 +780,27 @@ void RunGame(choosePlayerLvl playerOne, choosePlayerLvl playerTwo)
 	InitialiseBoard(&board[0]);
 	PrintBoard(&board[0]);
 
-	//delete me
-	led_button_choosen = -1;
-
 	while(!GameOver) {
 		if(Side==NOUGHTS) {
-			LastMoveMade = playerOne(&board[0], side, 1);
+			LastMoveMade = playerOne(&board[0], Side, depth_ply2);
 			MakeMove(&board[0],LastMoveMade,Side);
 			Side=CROSSES;
 			PrintBoard(&board[0]);
-
-
-
 		} else {
-			LastMoveMade = playerTwo(&board[0]);
+			LastMoveMade = playerTwo(&board[0], Side, depth_ply2);
 			MakeMove(&board[0],LastMoveMade,Side);
 			Side=NOUGHTS;
 			PrintBoard(&board[0]);
 		}
 
-
-		//Delayms(200);
-		// if three in a row exists Game is over
 		if( FindFourInARow(&board[0], LastMoveMade, Side ^ 1) == 4) {
-			//printf("Game over!\n");
 			GameOver = 1;
-			if(Side==NOUGHTS) {
-				//printf("Computer Wins\n");
-			} else {
-				//printf("Human Wins\n");
-			}
 		}
 
 		// if no more moves, game is a draw
 		if(!HasEmpty(board)) {
-			//printf("Game over!\n");
 			GameOver = 1;
-			//Anim_matrix();
-			//printf("It's a draw\n");
+			Anim_TrikotDriveBy(0,0,1, get_random_color());
 		}
 	}
 
@@ -830,76 +808,6 @@ void RunGame(choosePlayerLvl playerOne, choosePlayerLvl playerTwo)
 	DeleteAllLeds();
 	free(board);
 }
-
-
-void Rungame_here()
-{
-	{
-		flag_cursor_read_ADC_values = 0;
-	 	TM_RNG_Init();
-		int GameOver = 0;
-		int Side = NOUGHTS;
-		int LastMoveMade = 0;
-
-		int *board =  malloc(36*4* sizeof(int));
-		if(!board) return;
-
-		InitialiseBoard(&board[0]);
-		PrintBoard(&board[0]);
-
-		//delete me
-		led_button_choosen = -1;
-
-		while(!GameOver) {
-			if(Side==NOUGHTS) {
-				LastMoveMade = GetHumanMove(&board[0]);
-				MakeMove(&board[0],LastMoveMade,Side);
-				Side=CROSSES;
-				PrintBoard(&board[0]);
-
-
-
-			} else {
-				LastMoveMade = GetComputerMove(&board[0], Side,1);
-				MakeMove(&board[0],LastMoveMade,Side);
-				Side=NOUGHTS;
-				PrintBoard(&board[0]);
-			}
-
-
-			Delayms(100);
-			// if three in a row exists Game is over
-			if( FindFourInARow(&board[0], LastMoveMade, Side ^ 1) == 4) {
-				//printf("Game over!\n");
-				GameOver = 1;
-				if(Side==NOUGHTS) {
-					//printf("Computer Wins\n");
-				} else {
-					//printf("Human Wins\n");
-				}
-			}
-
-			// if no more moves, game is a draw
-			if(!HasEmpty(board)) {
-				//printf("Game over!\n");
-				GameOver = 1;
-				//Anim_matrix();
-				//printf("It's a draw\n");
-			}
-		}
-
-		PrintBoard(&board[0]);
-		DeleteAllLeds();
-		free(board);
-	}
-
-}
-
-
-
-
-
-
 
 
 

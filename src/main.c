@@ -1,219 +1,62 @@
 
-#include "defines.h"
-#include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
-#include <stm32f4xx_gpio.h>
-#include <stm32f4xx_tim.h>
-#include <stm32f4xx_spi.h>
-#include <misc.h>
 #include "tm_stm32f4_delay.h"
-#include "tlc_animations.h"
-#include "tm_stm32f4_button.h"
-#include "tm_stm32f4_hd44780.h"
 #include "tlc5940.h"
 #include "tic_tac_toe.h"
 #include <stdio.h>
 #include "tm_stm32f4_rng.h"
-
-
-
-
-/*
- * Pin configuration
- *
- * 		OUT2		OUT1				tlc5940	tlc5940stm
- * 		OUT3	D-> VPRG		PB4		VPRG	MISO
- * 		OUT4		SIN			PD7		SS		MOSI
- * 		OUT5		SCLK		PD5		SCK 	CLK
- * 		OUT6	D->	XLAT		PD3		XLAT	XLAT
- * 		OUT7	D->	BLANK		PD1		BLANK	BLANK
- * 		OUT8	D->	GND
- * 		OUT9	D->	VCC
- * 		OUT10	D->	IREF
- * 		OUT11	D->	DCPRG
- * 		OUT12	D->	GSCLK		PA0		GSCL	PWM GPIO_Pin_0
- * 		OUT13		SOUT
- * 		OUT14		XERR
- * 		OUT15		OUT16
- */
- #define TLC_RCC_AHB1 RCC_AHB1Periph_GPIOB
- #define TLC5940_GPIO 	GPIOB
- #define PIN_BLANK		GPIO_Pin_5
- #define PIN_VPRG 		GPIO_Pin_9
- #define PIN_XLAT 		GPIO_Pin_6
- #define PIN_GSCLK		GPIO_Pin_3
-
+#include "menu.h"
+#include "tm_stm32f4_hd44780.h"
 
 int timer_update=0;
-//b r g
-//g b r
-int main(void){
- SystemInit(); //168mhz
- //init_tim7();
- init_SPI1();
- Timer_Init(); //GSCLK + BLANK
- TM_DELAY_Init();
- // MCO2_INIT();
+
+void initTLC()
+{
+	 SystemInit(); //168mhz
+	 init_TLC_Pins_SPI();
+	 Timer_Init(); //GSCLK + BLANK
+
+	 // 64-step constant_current sink.The dot correction adjusts the brightness
+	 // variations between LED channels and other LED  drivers.
+	 Tlc5940_setAllDC(63);	//max 63
+
+	 //VPRG low, so we can send GSCLK data
+	 GPIO_SetPinLow(PORTx_TLC5940,PIN_VPRG);
+
+	 //make sure cube is off in start
+	 GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
+	 GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
+	 GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
+	 GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
+}
 
 
- //RANDOM INIT
- TM_RNG_Init();
+int main(void)
+{
+	//DELAY_INIT
+	TM_DELAY_Init();
 
- //LCD INIT
- TM_HD44780_Init(16, 2);
- TM_HD44780_Puts(0, 0, "Hello motherfucer");
+	//RANDOM INIT
+	TM_RNG_Init();
 
- tim_gsclk_init();
+	//TLC INIT
+	initTLC();
 
- Tlc5940_setAllDC(63);	//max 63
- //GPIO_SetPinHigh(TLC5940_GPIO,PIN_LEVEL_1);
- GPIO_SetPinLow(TLC5940_GPIO,PIN_VPRG);
+	//LCD INIT
+	TM_HD44780_Init(16, 2);
 
-    GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_1);
- 	GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_2);
- 	GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_3);
- 	GPIO_SetPinLow(PORTx_PIN_LVL, PIN_LEVEL_4);
+	//POTENCIOMETER INIT
+	TM_ADC_Init(ADC1, ADC_Channel_4);
+	TM_ADC_Init(ADC1, ADC_Channel_0);
+	TM_ADC_Init(ADC1, ADC_Channel_1);
+	TM_ADC_Init(ADC1, ADC_Channel_2);
 
- //Test
- /*GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
- for(n=0; n<(COUNT_TLC *16); n=n+2)
-		 {
+	//BUTTON_OK INIT
+	TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON_OK_EventHandler);
 
-			 data[n] = 4095/16*n;
-			 data[n+1] = 4095/16*(n+1);
-			 SPI1_send(data[n]>>4);
-			 SPI1_send((data[n]<<4) | (data[n+1])>>8);
-			 SPI1_send(data[n+1]);
-		 }
+	//Start refreshing cube
+	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+	TIM_Cmd(TIM3, ENABLE);
 
-		 GPIOE->BSRRL |= GPIO_Pin_7; // set PE7 (CS) high
-		 GPIO_ResetBits(GPIOD,GPIO_Pin_12);
-		 GPIOE->BSRRH |= GPIO_Pin_7;
-
-		 _delay(1);
-		 GPIO_SetPinHigh(TLC5940_GPIO,PIN_XLAT);
-		 _delay(1);
-		 GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
-		 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
-		 _delay(1);
- //EndTest
-			int i;
-					 //generate GSCLK
-				for (i = 0; i < 4096; i++){
-					TLC5940_GPIO->BSRRL = PIN_GSCLK;
-					 TLC5940_GPIO->BSRRH = PIN_GSCLK;
-				}
-				 Blank_Pulse();
-
-		*/
- //TODO: PRESTAV VSE V TM INIT FUNCKIJE
-   TM_ADC_Init(ADC1, ADC_Channel_4);
-   TM_ADC_Init(ADC1, ADC_Channel_0);
-   TM_ADC_Init(ADC1, ADC_Channel_1);
-   TM_ADC_Init(ADC1, ADC_Channel_2);
-
-  TM_BUTTON_Init(GPIOE, GPIO_Pin_4, 1, BUTTON_OK_EventHandler);
-
- TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
- TIM_Cmd(TIM3, ENABLE);
-
- while(1){
-	// menu();
-	 //Rungame_here();
-
-	 //int color = get_random_color();
-	 //Anim_zastave();
-	 //Anim_infinity_snail_rnd();
-	 	 BasicAnim_Colors();
-	 Rungame_here();
-	 RunGame(GetComputerMove(10, 1, 1), GetHumanMove);
-	 //BasicAnim_One_startToEnd();
-/*
-	 Anim_Quatro_2Squars_Infinity();
-	 Anim_Quatro_4Squars_Infinity();
-	Anime_Wall( count_up, STOLPEC);
-	 Anime_Wall( count_up, VRSTICA);
-	 Anime_Wall( count_down, STOLPEC);
-	 Anime_Wall( count_down, VRSTICA);
-	*/
-	 /*
-	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, get_random_color());
-	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,1, get_random_color());
-	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 1, get_random_color());
-	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 1, get_random_color());
-
-	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,4, get_random_color());
-	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, get_random_color());
-	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, get_random_color());
-	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, get_random_color());
-
-	*/
-
-	 BasicAnim_RGB_All();
-	// BasicAnim_RGB_All();
-
-//NOTE: Porpravi timer 3 prescaler and period!
-
-
-	 /*
-
-	 while(timer_update>20){
-
-		 	 data[15] +=16;
-		 	 data[14] +=16;
-			 data[13] +=16;
-			 data[12] +=16;
-			 data[11] +=16;
-			 data[10] +=16;
-			 data[9] +=16;
-			 data[8] +=16;
-			 data[7] +=16;
-			 data[6] +=16;
-			 data[5] +=16;
-			 data[4] +=16;
-			 data[3] +=16;
-			 data[2] +=16;
-			 data[1] +=16;
-
-
-
-
-
-			 GPIO_SetPinHigh(TLC5940_GPIO,PIN_BLANK);
-
-			 for(n=0; n<(COUNT_TLC *16); n=n+2)
-			 {
-
-				 data[n] = 4095/16*n;
-				 data[n+1] = 4095/16*(n+1);
-				 SPI1_send(data[n]>>4);
-				 SPI1_send((data[n]<<4) | (data[n+1])>>8);
-				 SPI1_send(data[n+1]);
-			 }
-
-			 GPIOE->BSRRL |= GPIO_Pin_7; // set PE7 (CS) high
-			 GPIO_ResetBits(GPIOD,GPIO_Pin_12);
-			 GPIOE->BSRRH |= GPIO_Pin_7;
-
-
-
-			 _delay(1);
-			 GPIO_SetPinHigh(TLC5940_GPIO,PIN_XLAT);
-			 _delay(1);
-			 GPIO_SetPinLow(TLC5940_GPIO,PIN_BLANK);
-			 GPIO_SetPinLow(TLC5940_GPIO,PIN_XLAT);
-			 _delay(1);
-
-			 timer_update=0;
-		}
-
-		int i;
-			 //generate GSCLK
-		for (i = 0; i < 4096; i++){
-			TLC5940_GPIO->BSRRL = PIN_GSCLK;
-			 TLC5940_GPIO->BSRRH = PIN_GSCLK;
-		}
-			 Blank_Pulse();
-			 */
- }
+	while(1) menu();
 }

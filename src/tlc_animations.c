@@ -942,7 +942,10 @@ void DeleteAllLeds()
 
 void ANIM_LIST_constat()
 {
-	 rainbow_all_cube_diff();
+	int i;
+	 for(i = 0; i < 30; i++){
+			 Anim_infinity_snail_rnd();
+		 }
 	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,1, get_random_color());
 	 Anim_Quatro_2Squars_Infinity();
 	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,1, get_random_color());
@@ -954,10 +957,10 @@ void ANIM_LIST_constat()
 
 	 Anim_TrikotDriveBy(STOLPEC,NAPREJ,4, get_random_color());
 	 Anim_TrikotDriveBy(VRSTICA,NAPREJ,4, get_random_color());
+	 rainbow_all_cube_diff();
 	 Anim_TrikotDriveBy(STOLPEC,NAZAJ, 4, get_random_color());
 	 Anim_TrikotDriveBy(VRSTICA,NAZAJ, 4, get_random_color());
 
-	 Anim_infinity_snail_rnd();
 	 Anime_Wall( count_down, STOLPEC);
 	 Anim_zastave();
 

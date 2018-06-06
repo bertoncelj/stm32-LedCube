@@ -12,6 +12,7 @@
     All the options for the library are located in defines.h, including
     #NUM_TLCS, what pins to use, and the PWM period.
 */
+
 uint8_t TLC5940_count;
 uint16_t *TLC5940_grayScale;
 
@@ -241,7 +242,7 @@ void init_TLC_Pins_SPI(void){
 	SPI_Cmd(SPI1, ENABLE); // enable SPI1
 }
 
-//STAY
+
 /* This funtion is used to transmit and receive data
 * with SPI1
 * data --> data to be transmitted

@@ -1,5 +1,6 @@
 #ifndef TLC5940_H
 #define TLC5940_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "stm32f4xx.h"
@@ -8,10 +9,9 @@
 
 #define NUM_TLCS 3
 #define COUNT_TLC 3
-/*SPI1
 
+/*SPI1
   *  GPIOA
-  *  MISO -> GPIO_Pin_6
   *  MOSI -> GPIO_Pin_7
   *  SCL  -> GPIO_Pin_5
  */
@@ -25,6 +25,7 @@
 
 
 #define TLC5940_GPIO 	GPIOB
+
 #define PORTx_SPI 	 GPIOA
 #define DD_MOSI 	 GPIO_Pin_7		//SIN -> MOSI
 #define DD_SCK 		 GPIO_Pin_5		//Clock SCLK
@@ -45,17 +46,6 @@
 #define PIN_LEVEL_3 	GPIO_Pin_3
 #define PIN_LEVEL_4 	GPIO_Pin_1
 
-//DELETE ME
-#define SIG_GSCLK_PORT				GPIOA
-#define SIG_GSCLK_PORT_CLK    		RCC_AHB1Periph_GPIOA
-#define SIG_GSCLK_PIN				GPIO_Pin8
-#define SIG_GSCLK_PINSOURCE			GPIO_PinSource8
-#define SIG_GSCLK_PIN_AF			GPIO_AF_TIM1
-
-#define SIG_GSCLK_TIMER				TIM1
-#define SIG_GSCLK_TIMER_CLK			RCC_APB2Periph_TIM1
-
-
 //
 /**
  * Pin configuration
@@ -74,13 +64,7 @@
  * 		OUT13		SOUT
  * 		OUT14		XERR
  * 		OUT15		OUT16
- *
- *
- *
- *
- *
- * */
-
+ */
 
 /**
  * @brief  Sets pin(s) high
@@ -102,41 +86,29 @@
 
 
 //array holding the data to be shifted in the driver
-uint16_t leds[15];
 
-
+//MAIN 4 ARRAYS FOR LAYERS
 uint16_t data_lvl1[COUNT_TLC * 16];
 uint16_t data_lvl2[COUNT_TLC * 16];
 uint16_t data_lvl3[COUNT_TLC * 16];
 uint16_t data_lvl4[COUNT_TLC * 16];
 
-//value for timer 2 GSCLK ?!? for now
 volatile uint16_t clkCnt;
-//timer for the PWM output
-void TIM2_IRQHandler(void);
 
-//Define functions
-void TLC_AllClock_Init(void);
-void setTLCChannel(uint8_t channel, uint16_t val);
+/* FUNCTIONS */
 void Timer_Init(void);
-void TLC_AllClock_Init(void);
-void TLC_Pin_Init(void);
-void PWM_Timer_Init_TLC(void);
-void resetTLC();
-void writeTLC(uint8_t data);
-void updateTLC();
-
-/*Nove Funkcije*/
-
-void init_tim7(void);
-void TIM7_IRQHandler(void);
 uint8_t SPI1_send(uint8_t data);
-void init_SPI1(void);
+void init_TLC_Pins_SPI(void);
 void Tlc5940_setAllDC(uint8_t value);
-void Blank_Pulse(void);
-void TLC_One_Led_On(uint8_t led_num);
-
+void TLC_Update_lvl(uint16_t *data_lvl);
 void TLC_here(void);
 void GSCLK_Pulzes(void);
+
+void _delay(int value);
+
+//One pulzs
+void Blank_Pulse(void);
+void GSCLK_Pulse(void);
+void Xlat_Pulse(void);
 
 #endif

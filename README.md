@@ -5,8 +5,8 @@ Software runs on STM32F4DISCOVERY kit with high performance microcontroller STM3
 LEDS are control by TLC5940 chip.
 
 ## Cube
-Pictures...
-Video....
+[Album](https://imgur.com/a/et8Eu76)
+
 
 ### Description
 
@@ -35,10 +35,16 @@ What things you need to install the software and how to install them
 
 ## Running the tests TicTacToe MinMax algorithem
 
-Test in terminal Console-Application
-'
-make minmax
-'
+Test in terminal Console-Application. Play vs computer with 2 layer depth recursive function. Run ConsoleApp_main.c in termianl:
+```
+make ConsoleApp_main
+```
+Run it:
+```
+./ConsoleApp_main
+```
+Play by type number from 1 to 64. Imagin 2D board as 3D cube stack layer on top of layer.
+
 ## Authors
 
 * **Tine Beroncelj** - tine.bertoncelj@gmail.com

@@ -1,14 +1,18 @@
 # RGB LED Cube 4x4x4 TicTacToe 
 
-STM32F4DISCOVERY kit with high performance microcontroller STM32F407VGT6.
+Cube when user can play 4x4x4 TicTacToe game vs computer which uses MinMax algorithem.
+Software runs on STM32F4DISCOVERY kit with high performance microcontroller STM32F407VGT6.
+LEDS are control by TLC5940 chip.
 
 ## Cube
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Pictures...
+Video....
+Description...
 
 ### Prerequisites
 
 What things you need to install the software and how to install them
+* IDE using are [System Workbench for STM32, AC6 Tool](http://www.openstm32.org/System%2BWorkbench%2Bfor%2BSTM32) and new [TrueSTUDIO](http://www.st.com/en/development-tools/truestudio.html)
 
 ```
 Give examples

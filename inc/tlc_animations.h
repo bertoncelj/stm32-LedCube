@@ -60,7 +60,7 @@ void Anim_snake_rainbow(int lvl);
 void Anim_TrikotDriveBy(Direction dir, int a, int lvl_sp, int color);
 void Anime_Wall( count_dir count_func, Direction dir);
 void Anim_Loytra(int x, int y, int z, int color);
-
+void Anim_login(void);
 
 	/*Infinity*/
 void Anim_Quatro_2Squars_Infinity();

@@ -390,6 +390,19 @@ void rainbow_all_cube_same()
 	}
 }
 
+void Anim_login()
+{
+	int i;
+	int r_color = TM_RNG_Get()%360;
+	int arr[23] = {0,1,2,7,10,9,8+16,5+16,6+16,16+11,16+15,16+14,32+13,32+8,32+5,32+2,48+2,48+7,48+11,48+10,48+9,48+5,48+6};
+	for(i = 0; i < 27; i++){
+
+		if(i<23)Update_cube_pin(arr[i], get_random_color());
+		if(i >= 4)Update_cube_pin(arr[i-4], 0);
+		Delayms(60);
+	}
+}
+
 void rainbow_all_cube_diff()
 {
 	int x,y,z,i;

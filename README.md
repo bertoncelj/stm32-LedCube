@@ -7,9 +7,13 @@ LEDS are control by TLC5940 chip.
 ## Cube
 Pictures...
 Video....
-Description...
 
-###Datasheet
+### Description
+
+Runs on 3 TLC5940, which each one control one of three colors. TLC have 16 outputs where is connected LED katode, and it can be pushed to the ground. 4 layers (16 leds in one layer) in hight, toggeld by MOSFETS, one layer at the time.
+Game TicTacToe can be play on where user with 3 potenciometers add his own coordinates in. Computer uses [MinMax] logic to calculate his next move. First one to 4 in a row wins!
+
+### Datasheet
 
 * [STM32F4DISCOVERY](http://www.st.com/content/ccc/resource/technical/document/user_manual/70/fe/4a/3f/e7/e1/4f/7d/DM00039084.pdf/files/DM00039084.pdf/jcr:content/translations/en.DM00039084.pdf) - general inforamtion
 * [TLC5940](http://www.ti.com/lit/ds/symlink/tlc5940.pdf) - manual

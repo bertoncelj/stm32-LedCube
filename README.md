@@ -5,13 +5,14 @@ Software runs on STM32F4DISCOVERY kit with high performance microcontroller STM3
 LEDS are control by TLC5940 chip.
 
 ## Cube
-[Album](https://imgur.com/a/et8Eu76)
+
+[Album](https://imgur.com/a/et8Eu76) - Pictures, Anim., end project
 
 
 ### Description
 
-Runs on 3 TLC5940, which each one control one of three colors. TLC have 16 outputs where is connected LED katode, and it can be pushed to the ground. 4 layers (16 leds in one layer) in hight, toggeld by MOSFETS, one layer at the time.
-Game TicTacToe can be play on where user with 3 potenciometers add his own coordinates in. Computer uses [MinMax] logic to calculate his next move. First one to 4 in a row wins!
+Runs on 3 TLC5940, which each one control one of three colors. TLC have 16 outputs where is connected LED katode, and it can be pushed to the ground. 4 layers (16 leds in one layer) in high, toggled by MOSFETS, one layer at the time.
+Game TicTacToe can be play on where user with 3 potentiometers add his own coordinates in. Computer uses [MinMax] logic to calculate his next move. First one to 4 in a row wins!
 
 ### Datasheet
 
@@ -35,7 +36,7 @@ What things you need to install the software and how to install them
 
 ## Running the tests TicTacToe MinMax algorithem
 
-Test in terminal Console-Application. Play vs computer with 2 layer depth recursive function. Run ConsoleApp_main.c in termianl:
+Test in terminal Console-Application. Play vs computer with 2 layer depth recursive function. Run ConsoleApp_main.c in terminal:
 ```
 make ConsoleApp_main
 ```

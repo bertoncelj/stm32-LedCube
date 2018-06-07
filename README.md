@@ -9,6 +9,12 @@ Pictures...
 Video....
 Description...
 
+###Datasheet
+
+* [STM32F4DISCOVERY](http://www.st.com/content/ccc/resource/technical/document/user_manual/70/fe/4a/3f/e7/e1/4f/7d/DM00039084.pdf/files/DM00039084.pdf/jcr:content/translations/en.DM00039084.pdf) - general inforamtion
+* [TLC5940](http://www.ti.com/lit/ds/symlink/tlc5940.pdf) - manual
+* [Shematic](https://cdn.instructables.com/ORIG/F7Q/NBEM/H1QMLAYD/F7QNBEMH1QMLAYD.png) - for Arduino
+
 ## Installing
 
 What things you need to install the software and how to install them
@@ -26,12 +32,9 @@ What things you need to install the software and how to install them
 ## Running the tests TicTacToe MinMax algorithem
 
 Test in terminal Console-Application
-
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
+'
+make minmax
+'
 ## Authors
 
-* **Tine Beroncelj** - 
+* **Tine Beroncelj** - tine.bertoncelj@gmail.com

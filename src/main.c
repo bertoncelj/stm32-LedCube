@@ -57,6 +57,7 @@ int main(void)
 	//Start refreshing cube
 	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 	TIM_Cmd(TIM3, ENABLE);
+	Anim_login();
 
 	while(1) menu();
 }

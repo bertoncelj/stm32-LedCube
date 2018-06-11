@@ -6,14 +6,10 @@
  */
 
 #include "tic_tac_toe.h"
+#include "tm_stm32f4_hd44780.h"
 //#include "tlc_animations.h"
 
 int led_value_16;
-int led_value_adc_x;
-int led_value_adc_y;
-int led_value_adc_z;
-
-
 
 /*Tic Tac Toe variables*/
 int player = CROSSES;
@@ -148,17 +144,23 @@ void BUTTON_OK_EventHandler(TM_BUTTON_PressType_t type)
  * @param: ON_CRUSOR, OFF_CRUSOR
  * @param: color in 16
  * */
-void DisplayCrusor(int on, int color)
+void DisplayCrusor(CrusorValues *newCrusorValues)
 {
-	int led_on_off;
-	//TODO: change on off and give defines;  change parameters
-	if(on == 1){
-		led_on_off = 1;
-	} else {
-		led_on_off = 0;
+	static int x_adc_read;
+	static int y_adc_read;
+	static int z_adc_read;
+
+	if(newCrusorValues->led_value_adc_x != x_adc_read || newCrusorValues->led_value_adc_y != y_adc_read ||
+			newCrusorValues->led_value_adc_z != z_adc_read){
+		Pin_on_crusor(x_adc_read, y_adc_read, z_adc_read, 0);
+
+		x_adc_read = newCrusorValues->led_value_adc_x;
+		y_adc_read = newCrusorValues->led_value_adc_y;
+		z_adc_read = newCrusorValues->led_value_adc_z;
+		newCrusorValues->displayCrusorON_OFF = true;
+
+		Pin_on_crusor(x_adc_read, y_adc_read, z_adc_read, 1);
 	}
-	//give color or erase it
-	Pin_on_crusor(led_value_adc_x, led_value_adc_y, led_value_adc_z, led_on_off);
 }
 
 int Read_ADC_difference(int *old, int *new)
@@ -169,7 +171,7 @@ int Read_ADC_difference(int *old, int *new)
 	else return *old;
 }
 
-void Cursor_read_ADC_values()
+void Cursor_read_ADC_values(CrusorValues *newCrusorValues)
 {
 	static int x_adc_read;
 	static int y_adc_read;
@@ -196,28 +198,29 @@ void Cursor_read_ADC_values()
 	y_adc_read = Read_ADC_difference(&y_adc_read, &y_read_new);
 	z_adc_read = Read_ADC_difference(&z_adc_read, &z_read_new);
 
-	led_value_adc_x = x_adc_read / 1050;
-	led_value_adc_y = y_adc_read / 1050;
-	led_value_adc_z = z_adc_read / 1050;
+	newCrusorValues->led_value_adc_x = x_adc_read / 1050;
+	newCrusorValues->led_value_adc_y = y_adc_read / 1050;
+	newCrusorValues->led_value_adc_z = z_adc_read / 1050;
+
 }
 
-void read_ADC_led()
+void read_ADC_led(CrusorValues *newCrusorValues)
 {
 	int color = 0x0000FF; //Blue standart color
 
 	led_button_choosen = -1;
 
-	Cursor_read_ADC_values();
+	Cursor_read_ADC_values(newCrusorValues);
 
 	//Led Curzor on
-	DisplayCrusor(1, color);
+	DisplayCrusor(newCrusorValues);
 	//data_lvl1[led_value] = 4095;
 
 	TM_BUTTON_Update();
 	Delayms(100);
 
 	//Led Curzor off
-	DisplayCrusor(0, color);
+	//DisplayCrusor(0, color);
 }
 
 /**
@@ -697,22 +700,10 @@ int GetComputerMove(int *board, const int side,const int max_depth)
 	TIM_Cmd(TIM3, DISABLE);
 	Move bestMove = findBestMove(board, side, max_depth);
 	TIM_Cmd(TIM3, ENABLE);
+
+	//Delay so it can be display for viewer
+	Delayms(120);
 	return bestMove.Move_position;
-	/* RANDOM
-	int index = 0;
-	int numFree = 0;
-	int availableMoves[16*4];
-	int randMove = 0;
-
-	for(index = 0; index < 16*4; ++index) {
-		if( board[ConvertTo36_4[index]] == EMPTY) {
-			availableMoves[numFree++] = ConvertTo36_4[index];
-		};
-	}
-
-	randMove = (TM_RNG_Get() % numFree);
-	return availableMoves[randMove];
-	*/
 }
 
 /**
@@ -726,36 +717,13 @@ int GetHumanMove(int *board, int Side, int depth)
 	int moveOk = 0;
 	//TODO:Poprav tale led_button_choosen!
 	led_button_choosen = -1;
-
+	CrusorValues newCrusorValues;
 	while (moveOk == 0) {
 		while(led_button_choosen < 0){
-			read_ADC_led();
-		}
-		/*
-		printf("Please enter a move from 1 to 16:");
-		fgets(userInput, 3, stdin);
-		fflush(stdin);
-
-		if(strlen(userInput) != 2) {
-			printf("Invalid strlen()\n");
-			continue;
+			read_ADC_led(&newCrusorValues);
 		}
 
-		if( sscanf(userInput, "%d", &move) != 1) {
-			move = -1;
-			printf("Invalid sscanf()\n");
-			continue;
-		}
-
-		if( move < 1 || move > 16) {
-			move = -1;
-			printf("Invalid range\n");
-			continue;
-		}
-		*/
-		// move--; // Zero indexing
-
-		if( board[LedArray3D_TicTacToe[led_value_adc_z][led_value_adc_x][led_value_adc_y]]!= EMPTY) {
+		if( board[LedArray3D_TicTacToe[newCrusorValues.led_value_adc_z][newCrusorValues.led_value_adc_x][newCrusorValues.led_value_adc_y]]!= EMPTY) {
 			//printf("Square not available\n");
 			led_button_choosen = -1;
 			continue;
@@ -763,11 +731,13 @@ int GetHumanMove(int *board, int Side, int depth)
 		moveOk = 1;
 	}
 	//printf("Making Move...%d\n",(move+1));
-	return LedArray3D_TicTacToe[led_value_adc_z][led_value_adc_x][led_value_adc_y];
+	return LedArray3D_TicTacToe[newCrusorValues.led_value_adc_z][newCrusorValues.led_value_adc_x][newCrusorValues.led_value_adc_y];
 }
 
 void RunGame(choosePlayer playerOne, choosePlayer playerTwo, int depth_ply1, int depth_ply2)
 {
+	TM_HD44780_Clear();
+	TM_HD44780_Puts(0,0,"In Game...");
 	flag_cursor_read_ADC_values = 0;
  	TM_RNG_Init();
 	int GameOver = 0;
@@ -782,7 +752,7 @@ void RunGame(choosePlayer playerOne, choosePlayer playerTwo, int depth_ply1, int
 
 	while(!GameOver) {
 		if(Side==NOUGHTS) {
-			LastMoveMade = playerOne(&board[0], Side, depth_ply2);
+			LastMoveMade = playerOne(&board[0], Side, depth_ply1);
 			MakeMove(&board[0],LastMoveMade,Side);
 			Side=CROSSES;
 			PrintBoard(&board[0]);

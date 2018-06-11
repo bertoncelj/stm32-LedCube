@@ -37,6 +37,13 @@ typedef struct move
 	int bestVal;
 }Move;
 
+typedef struct {
+	int led_value_adc_x;
+	int led_value_adc_y;
+	int led_value_adc_z;
+	int displayCrusorON_OFF;
+}CrusorValues;
+
 int LedArrayOneLvl[16];
 int led_button_choosen;
 
@@ -48,12 +55,12 @@ extern uint32_t TM_RNG_Get(void);
 
 //Button function
 void BUTTON_OK_EventHandler(TM_BUTTON_PressType_t type);
-void read_ADC_led();
+void read_ADC_led(CrusorValues *newCrusorValues);
 int  Read_ADC_difference(int *old, int *new);
 void EmptyPrintBoard(void);
 int  HasEmpty(const int *board);
 void PrintBoard(const int *board);
-void DisplayCrusor(int on, int color);
+void DisplayCrusor(CrusorValues *newCrusorValues);
 
 /*Tic tac toe*/
 int  GetNumForDir(int startSq, const int dir, const int *board, const int us);
@@ -65,7 +72,6 @@ int  GetHumanMove   ( int *board, int Side, int depth);
 int  GetComputerMove( int *board, const int side, int max_depth);
 
 void RunGame(choosePlayer playerOne, choosePlayer playerTwo, int depth_ply1, int depth_ply2);
-void DisplayCrusor(int on, int color);
 void DisplayWinner( int *board, const int ourIndex, const int us, const int DirIndex);
 
 /*MinMax*/

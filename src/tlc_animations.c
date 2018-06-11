@@ -955,6 +955,8 @@ void DeleteAllLeds()
 
 void ANIM_LIST_constat()
 {
+	TM_HD44780_Clear();
+	TM_HD44780_Puts(0,0,"In Animations...");
 	int i;
 	 for(i = 0; i < 30; i++){
 			 Anim_infinity_snail_rnd();
